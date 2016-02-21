@@ -27,9 +27,38 @@ if [ ! -f ../Makefile.in-orig ]; then
 fi
 ed ../Makefile.in <<'EndOfInput'
 /TOOLS = 
-/lackey
-a
-		cputil  \
+/		none
+i
+		cputil \
+.
+w
+q
+EndOfInput
+
+# fix Makefile.am
+if [ ! -f ../Makefile.am-orig ]; then
+  cp ../Makefile.am ../Makefile.am-orig
+fi
+ed ../Makefile.am <<'EndOfInput'
+/TOOLS = 
+/		none
+i
+		cputil \
+.
+w
+q
+EndOfInput
+
+# fix configure.ac
+if [ ! -f ../configure.ac-orig ]; then
+  cp ../configure.ac ../configure.ac-orig
+fi
+ed ../configure.ac <<'EndOfInput'
+/AC_CONFIG_FILES(
+/   none\/Makefile
+i
+   cputil/Makefile
+   cputil/tests/Makefile
 .
 w
 q

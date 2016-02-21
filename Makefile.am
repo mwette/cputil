@@ -1,16 +1,25 @@
 include $(top_srcdir)/Makefile.tool.am
 
-EXTRA_DIST = docs/xp-manual.xml
+EXTRA_DIST = docs/cu-manual.xml
 
 #----------------------------------------------------------------------------
 # Headers
 #----------------------------------------------------------------------------
 
 pkginclude_HEADERS = \
-        cputil.h \
+        cputil.h
+
+noinst_HEADERS = \
         cputildefs.h
 
-noinst_HEADERS =
+# cputil.h is generated from cputildefs.h, removing the include cpp stmt
+
+bin_SCRIPTS = cputil
+
+cputil:
+	echo "#!/bin/sh" >cputil
+	echo "$prefix/lib/vg -q" '--tool=cputil "$@"' >>cputil
+	chmod +x cputil
 
 #----------------------------------------------------------------------------
 # cputil-<platform>
@@ -21,10 +30,10 @@ if VGCONF_HAVE_PLATFORM_SEC
 noinst_PROGRAMS += cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@
 endif
 
-XPROF_SOURCES_COMMON = cu_main.c
+CPUTIL_SOURCES_COMMON = cu_main.c
 
 cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_SOURCES      = \
-	$(XPROF_SOURCES_COMMON)
+	$(CPUTIL_SOURCES_COMMON)
 cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CPPFLAGS     = \
 	$(AM_CPPFLAGS_@VGCONF_PLATFORM_PRI_CAPS@)
 cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CFLAGS       = \
@@ -44,7 +53,7 @@ cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LINK = \
 
 if VGCONF_HAVE_PLATFORM_SEC
 cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES      = \
-	$(XPROF_SOURCES_COMMON)
+	$(CPUTIL_SOURCES_COMMON)
 cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CPPFLAGS     = \
 	$(AM_CPPFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
 cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CFLAGS       = \
@@ -67,13 +76,13 @@ endif
 # vgpreload_cputil-<platform>.so
 #----------------------------------------------------------------------------
 
-#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so
-#if VGCONF_HAVE_PLATFORM_SEC
-#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
-#endif
-#
-#if VGCONF_OS_IS_DARWIN
-#noinst_DSYMS = $(noinst_PROGRAMS)
-#endif
+noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so
+if VGCONF_HAVE_PLATFORM_SEC
+noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
+endif
+
+if VGCONF_OS_IS_DARWIN
+noinst_DSYMS = $(noinst_PROGRAMS)
+endif
 
 
