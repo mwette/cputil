@@ -1,0 +1,6 @@
+*~
+Makefile
+*.o
+cputil-*
+.deps
+*.pyc
