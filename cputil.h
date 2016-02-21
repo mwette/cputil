@@ -1,6 +1,6 @@
 /* cputil.h - part of valgrind cpu utilization tool
 
-   Copyright (C) 2013,2015 Matthew R. Wette
+   Copyright (C) 2013,2016 Matthew R. Wette
    mwette@alumni.caltech.edu
 
    This program is free software; you can redistribute it and/or

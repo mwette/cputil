@@ -2,7 +2,7 @@
 #
 # gen_header.py - generate portable header
 #
-# Copyright (C) 2013-2013 Matthew R. Wette
+# Copyright (C) 2013 Matthew R. Wette
 # mwette@alumni.caltech.edu
 #
 # This program is free software; you can redistribute it and/or

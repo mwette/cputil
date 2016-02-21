@@ -1,6 +1,6 @@
 /* cputildefs.h - execution profiling under valgrind
 
-   Copyright (C) 2013-2013 Matthew R. Wette
+   Copyright (C) 2013,2016 Matthew R. Wette
    mwette@alumni.caltech.edu
  
    This program is free software; you can redistribute it and/or
@@ -50,4 +50,4 @@ typedef
    VALGRIND_DO_CLIENT_REQUEST_STMT(VG_USERREQ__CU_SETCTR2PTR, PTR, 0,0,0,0)
 
 #endif
-/* --- last line of cputildefs.h --- */
+/* --- last line --- */

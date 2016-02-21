@@ -2,7 +2,7 @@
 #
 # gen_tables.py - generate blank table or load (default) table into xp_main.c
 #
-# Copyright (C) 2013-2013 Matthew R. Wette
+# Copyright (C) 2013 Matthew R. Wette
 # mwette@alumni.caltech.edu
 #
 # This program is free software; you can redistribute it and/or

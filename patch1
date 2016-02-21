@@ -1,15 +1,35 @@
 #!/bin/sh
 #
+# Copyright (C) 2016 Matthew R. Wette
+# 
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
 
+# fix configure
+if [ ! -f ../configure-orig ]; then
+  cp ../configure ../configure-orig
+fi
+ed ../configure <<'EndOfInput'
+/^cat >confcache 
+i
+ac_config_files="$ac_config_files cputil/Makefile cputil/tests/Makefile"
+
+.
+w
+q
+EndOfInput
+
+# fix Makefile.in
 if [ ! -f ../Makefile.in-orig ]; then
   cp ../Makefile.in ../Makefile.in-orig
 fi
-
 ed ../Makefile.in <<'EndOfInput'
 /TOOLS = 
 /lackey
 a
-               cputil  \
+		cputil  \
 .
 w
 q

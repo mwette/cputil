@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+# min dist for running xprof
+#
+# Copyright (C) 2016 Matthew R. Wette
+# 
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+prefix=/var/tmp/vgcu
+srcdist=valgrind-3.11.0
+
+rm -f $prefix/bin/callgrind*
+rm -f $prefix/bin/cg_*
+rm -f $prefix/bin/ms_print
+rm -f $prefix/bin/valgrind-di-server
+rm -f $prefix/bin/valgrind-listener
+rm -f $prefix/bin/vgdb
+if [ -f $prefix/bin/valgrind ]; then
+  mv $prefix/bin/valgrind $prefix/lib/vg
+fi
+if [ ! -f $prefix/bin/cputil ]; then
+  cat >$prefix/bin/cputil <<EndOfInput
+#!/bin/sh
+$prefix/lib/vg -q --tool=cputil "\$@"
+EndOfInput
+fi
+chmod +x $prefix/bin/cputil
+#
+if [ -f $prefix/include/valgrind/cputil.h ]; then
+   mv $prefix/include/valgrind/cputil.h $prefix/
+#   ed $prefix/cputil.h << EndOfInput
+#6,21d
+#w
+#q
+#EndOfInput
+fi
+if [ -f $prefix/include/valgrind/libvex_ir.h ]; then
+  mv $prefix/include/valgrind/libvex_ir.h $prefix/lib/
+fi
+rm -rf $prefix/include
+rm -rf $prefix/share
+rm -rf $prefix/lib/pkgconfig
+#
+rm -rf $prefix/lib/valgrind/vgpreload_memcheck*
+rm -rf $prefix/lib/valgrind/vgpreload_massif*
+rm -rf $prefix/lib/valgrind/vgpreload_exp*
+rm -rf $prefix/lib/valgrind/vgpreload_drd*
+rm -rf $prefix/lib/valgrind/vgpreload_helgrind*
+#
+rm -f $prefix/lib/valgrind/s390*
+rm -f $prefix/lib/valgrind/power*
+rm -f $prefix/lib/valgrind/mips*
+rm -f $prefix/lib/valgrind/arm*
+#
+rm -rf $prefix/lib/valgrind/none*
+rm -rf $prefix/lib/valgrind/memcheck*
+rm -rf $prefix/lib/valgrind/massif*
+rm -rf $prefix/lib/valgrind/helgrind*
+rm -rf $prefix/lib/valgrind/lackey*
+rm -rf $prefix/lib/valgrind/exp*
+rm -rf $prefix/lib/valgrind/drd*
+rm -rf $prefix/lib/valgrind/cachegrind*
+rm -rf $prefix/lib/valgrind/callgrind*
+#
+rm -f $prefix/lib/valgrind/*.xml
+rm -f $prefix/lib/valgrind/*.a
+rm -f $prefix/lib/valgrind/default.supp
+#
+strip $prefix/lib/valgrind/cputil-*
+
+if [ -f $srcdist/COPYING ]; then
+  cp $srcdist/COPYING $prefix/lib/COPYING
+fi
+# --- last line of mindist ---
