@@ -1,3 +1,0 @@
-#!/bin/sh
-prefix=/var/tmp/vgcu/
-$prefix/lib/vg -q --tool=cputil "$@"

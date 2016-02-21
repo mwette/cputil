@@ -11,14 +11,16 @@ copy of the license is included with the distribution as COPYING.DOC.
 
 ## Installation
 
+This works with valgrind-3.11.0.  Goal will be to work w/ >3.0.
+
 To install:
-1. Download and unpack valgring-3.0.11
-2. clone or otherwise install this cputil distribution in a directory
-   called *cputil* under valgrind-3.0.11
+1. Download and unpack valgring-3.11.0
+2. Clone or otherwise install this cputil distribution in a directory
+   called *cputil* under valgrind-3.11.0
 3. in the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
-   .../valgring-3.0.11/cputil
+   .../valgring-3.11.0/cputil
    $ ./patch1
    ```
 4. In the valgrind top direcotry run configure, make and install
@@ -44,4 +46,3 @@ Try running with "--vex-guest-chase-thresh=0 --trace-flags=10000000
 translated, and that includes the address.  Re-run w/ 999999 changed 
 to highest bb number shown.
 
-===========================================--=================================

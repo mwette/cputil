@@ -94,41 +94,40 @@
 #elif defined(__APPLE__) && defined(__x86_64__)
 
 #define CU_CLRCTR1()	\
-	__extension__ ({ volatile unsigned long long int \
-	_zzq_args[6]; volatile unsigned long long int _zzq_result; \
-	_zzq_args[0] = (unsigned long long int)(0x43550001); \
-	_zzq_args[1] = (unsigned long long int)(0); _zzq_args[2] = \
-	(unsigned long long int)(0); _zzq_args[3] = (unsigned long \
-	long int)(0); _zzq_args[4] = (unsigned long long int)(0); \
-	_zzq_args[5] = (unsigned long long int)(0); __asm__ \
-	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	__extension__ ({ volatile unsigned long int _zzq_args[6]; \
+	volatile unsigned long int _zzq_result; _zzq_args[0] = \
+	(unsigned long int)(0x43550001); _zzq_args[1] = (unsigned \
+	long int)(0); _zzq_args[2] = (unsigned long int)(0); \
+	_zzq_args[3] = (unsigned long int)(0); _zzq_args[4] = \
+	(unsigned long int)(0); _zzq_args[5] = (unsigned long \
+	int)(0); __asm__ volatile( \
+	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; })
 
 #define CU_GETCTR1()	\
-	__extension__ ({ volatile unsigned long long int \
-	_zzq_args[6]; volatile unsigned long long int _zzq_result; \
-	_zzq_args[0] = (unsigned long long int)(0x43550002); \
-	_zzq_args[1] = (unsigned long long int)(0); _zzq_args[2] = \
-	(unsigned long long int)(0); _zzq_args[3] = (unsigned long \
-	long int)(0); _zzq_args[4] = (unsigned long long int)(0); \
-	_zzq_args[5] = (unsigned long long int)(0); __asm__ \
-	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	__extension__ ({ volatile unsigned long int _zzq_args[6]; \
+	volatile unsigned long int _zzq_result; _zzq_args[0] = \
+	(unsigned long int)(0x43550002); _zzq_args[1] = (unsigned \
+	long int)(0); _zzq_args[2] = (unsigned long int)(0); \
+	_zzq_args[3] = (unsigned long int)(0); _zzq_args[4] = \
+	(unsigned long int)(0); _zzq_args[5] = (unsigned long \
+	int)(0); __asm__ volatile( \
+	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; })
 
 #define CU_SETCTR2PTR(PTR)	\
-	do { (void) __extension__ ({ volatile unsigned long long \
-	int _zzq_args[6]; volatile unsigned long long int \
-	_zzq_result; _zzq_args[0] = (unsigned long long \
-	int)((0x43550003)); _zzq_args[1] = (unsigned long long \
-	int)((PTR)); _zzq_args[2] = (unsigned long long int)((0)); \
-	_zzq_args[3] = (unsigned long long int)((0)); _zzq_args[4] \
-	= (unsigned long long int)((0)); _zzq_args[5] = (unsigned \
-	long long int)((0)); __asm__ volatile( \
-	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	do { (void) __extension__ ({ volatile unsigned long int \
+	_zzq_args[6]; volatile unsigned long int _zzq_result; \
+	_zzq_args[0] = (unsigned long int)((0x43550003)); \
+	_zzq_args[1] = (unsigned long int)((PTR)); _zzq_args[2] = \
+	(unsigned long int)((0)); _zzq_args[3] = (unsigned long \
+	int)((0)); _zzq_args[4] = (unsigned long int)((0)); \
+	_zzq_args[5] = (unsigned long int)((0)); __asm__ \
+	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; }); } while (0)
@@ -213,41 +212,40 @@
 #elif defined(__linux__) && defined(__x86_64__)
 
 #define CU_CLRCTR1()	\
-	__extension__ ({ volatile unsigned long long int \
-	_zzq_args[6]; volatile unsigned long long int _zzq_result; \
-	_zzq_args[0] = (unsigned long long int)(0x43550001); \
-	_zzq_args[1] = (unsigned long long int)(0); _zzq_args[2] = \
-	(unsigned long long int)(0); _zzq_args[3] = (unsigned long \
-	long int)(0); _zzq_args[4] = (unsigned long long int)(0); \
-	_zzq_args[5] = (unsigned long long int)(0); __asm__ \
-	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	__extension__ ({ volatile unsigned long int _zzq_args[6]; \
+	volatile unsigned long int _zzq_result; _zzq_args[0] = \
+	(unsigned long int)(0x43550001); _zzq_args[1] = (unsigned \
+	long int)(0); _zzq_args[2] = (unsigned long int)(0); \
+	_zzq_args[3] = (unsigned long int)(0); _zzq_args[4] = \
+	(unsigned long int)(0); _zzq_args[5] = (unsigned long \
+	int)(0); __asm__ volatile( \
+	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; })
 
 #define CU_GETCTR1()	\
-	__extension__ ({ volatile unsigned long long int \
-	_zzq_args[6]; volatile unsigned long long int _zzq_result; \
-	_zzq_args[0] = (unsigned long long int)(0x43550002); \
-	_zzq_args[1] = (unsigned long long int)(0); _zzq_args[2] = \
-	(unsigned long long int)(0); _zzq_args[3] = (unsigned long \
-	long int)(0); _zzq_args[4] = (unsigned long long int)(0); \
-	_zzq_args[5] = (unsigned long long int)(0); __asm__ \
-	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	__extension__ ({ volatile unsigned long int _zzq_args[6]; \
+	volatile unsigned long int _zzq_result; _zzq_args[0] = \
+	(unsigned long int)(0x43550002); _zzq_args[1] = (unsigned \
+	long int)(0); _zzq_args[2] = (unsigned long int)(0); \
+	_zzq_args[3] = (unsigned long int)(0); _zzq_args[4] = \
+	(unsigned long int)(0); _zzq_args[5] = (unsigned long \
+	int)(0); __asm__ volatile( \
+	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; })
 
 #define CU_SETCTR2PTR(PTR)	\
-	do { (void) __extension__ ({ volatile unsigned long long \
-	int _zzq_args[6]; volatile unsigned long long int \
-	_zzq_result; _zzq_args[0] = (unsigned long long \
-	int)((0x43550003)); _zzq_args[1] = (unsigned long long \
-	int)((PTR)); _zzq_args[2] = (unsigned long long int)((0)); \
-	_zzq_args[3] = (unsigned long long int)((0)); _zzq_args[4] \
-	= (unsigned long long int)((0)); _zzq_args[5] = (unsigned \
-	long long int)((0)); __asm__ volatile( \
-	"rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
+	do { (void) __extension__ ({ volatile unsigned long int \
+	_zzq_args[6]; volatile unsigned long int _zzq_result; \
+	_zzq_args[0] = (unsigned long int)((0x43550003)); \
+	_zzq_args[1] = (unsigned long int)((PTR)); _zzq_args[2] = \
+	(unsigned long int)((0)); _zzq_args[3] = (unsigned long \
+	int)((0)); _zzq_args[4] = (unsigned long int)((0)); \
+	_zzq_args[5] = (unsigned long int)((0)); __asm__ \
+	volatile("rolq $3,  %%rdi ; rolq $13, %%rdi\n\t"  \
 	"rolq $61, %%rdi ; rolq $51, %%rdi\n\t" "xchgq %%rbx,%%rbx" \
 	: "=d" (_zzq_result) : "a" (&_zzq_args[0]), "0" (0) : "cc", \
 	"memory" ); _zzq_result; }); } while (0)
@@ -262,10 +260,11 @@
 	(unsigned int)(0); _zzq_args[4] = (unsigned int)(0); \
 	_zzq_args[5] = (unsigned int)(0); _zzq_ptr = _zzq_args; \
 	__asm__ volatile("mr 3,%1\n\t" "mr 4,%2\n\t"  \
-	"rlwinm 0,0,3,0,0  ; rlwinm 0,0,13,0,0\n\t"  \
-	"rlwinm 0,0,29,0,0 ; rlwinm 0,0,19,0,0\n\t" "or 1,1,1\n\t" \
-	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
-	"cc", "memory", "r3", "r4"); _zzq_result; })
+	"rlwinm 0,0,3,0,31  ; rlwinm 0,0,13,0,31\n\t"  \
+	"rlwinm 0,0,29,0,31 ; rlwinm 0,0,19,0,31\n\t"  \
+	"or 1,1,1\n\t" "mr %0,3" : "=b" (_zzq_result) : "b" (0), \
+	"b" (_zzq_ptr) : "cc", "memory", "r3", "r4"); _zzq_result; \
+	})
 
 #define CU_GETCTR1()	\
 	__extension__ ({ unsigned int _zzq_args[6]; unsigned int \
@@ -275,10 +274,11 @@
 	(unsigned int)(0); _zzq_args[4] = (unsigned int)(0); \
 	_zzq_args[5] = (unsigned int)(0); _zzq_ptr = _zzq_args; \
 	__asm__ volatile("mr 3,%1\n\t" "mr 4,%2\n\t"  \
-	"rlwinm 0,0,3,0,0  ; rlwinm 0,0,13,0,0\n\t"  \
-	"rlwinm 0,0,29,0,0 ; rlwinm 0,0,19,0,0\n\t" "or 1,1,1\n\t" \
-	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
-	"cc", "memory", "r3", "r4"); _zzq_result; })
+	"rlwinm 0,0,3,0,31  ; rlwinm 0,0,13,0,31\n\t"  \
+	"rlwinm 0,0,29,0,31 ; rlwinm 0,0,19,0,31\n\t"  \
+	"or 1,1,1\n\t" "mr %0,3" : "=b" (_zzq_result) : "b" (0), \
+	"b" (_zzq_ptr) : "cc", "memory", "r3", "r4"); _zzq_result; \
+	})
 
 #define CU_SETCTR2PTR(PTR)	\
 	do { (void) __extension__ ({ unsigned int _zzq_args[6]; \
@@ -288,53 +288,52 @@
 	_zzq_args[3] = (unsigned int)((0)); _zzq_args[4] = \
 	(unsigned int)((0)); _zzq_args[5] = (unsigned int)((0)); \
 	_zzq_ptr = _zzq_args; __asm__ volatile("mr 3,%1\n\t"  \
-	"mr 4,%2\n\t" "rlwinm 0,0,3,0,0  ; rlwinm 0,0,13,0,0\n\t" \
-	"rlwinm 0,0,29,0,0 ; rlwinm 0,0,19,0,0\n\t" "or 1,1,1\n\t" \
-	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
-	"cc", "memory", "r3", "r4"); _zzq_result; }); } while (0)
+	"mr 4,%2\n\t" "rlwinm 0,0,3,0,31  ; rlwinm 0,0,13,0,31\n\t" \
+	"rlwinm 0,0,29,0,31 ; rlwinm 0,0,19,0,31\n\t"  \
+	"or 1,1,1\n\t" "mr %0,3" : "=b" (_zzq_result) : "b" (0), \
+	"b" (_zzq_ptr) : "cc", "memory", "r3", "r4"); _zzq_result; \
+	}); } while (0)
 
 #elif defined(__linux__) && defined(__powerpc__) && defined(__powerpc64__)
 
 #define CU_CLRCTR1()	\
-	__extension__ ({ unsigned long long int _zzq_args[6]; \
-	unsigned long long int _zzq_result; unsigned long long int* \
-	_zzq_ptr; _zzq_args[0] = (unsigned long long \
-	int)(0x43550001); _zzq_args[1] = (unsigned long long \
-	int)(0); _zzq_args[2] = (unsigned long long int)(0); \
-	_zzq_args[3] = (unsigned long long int)(0); _zzq_args[4] = \
-	(unsigned long long int)(0); _zzq_args[5] = (unsigned long \
-	long int)(0); _zzq_ptr = _zzq_args; __asm__ volatile( \
-	"mr 3,%1\n\t" "mr 4,%2\n\t"  \
+	__extension__ ({ unsigned long int _zzq_args[6]; unsigned \
+	long int _zzq_result; unsigned long int* _zzq_ptr; \
+	_zzq_args[0] = (unsigned long int)(0x43550001); \
+	_zzq_args[1] = (unsigned long int)(0); _zzq_args[2] = \
+	(unsigned long int)(0); _zzq_args[3] = (unsigned long \
+	int)(0); _zzq_args[4] = (unsigned long int)(0); \
+	_zzq_args[5] = (unsigned long int)(0); _zzq_ptr = \
+	_zzq_args; __asm__ volatile("mr 3,%1\n\t" "mr 4,%2\n\t" \
 	"rotldi 0,0,3  ; rotldi 0,0,13\n\t"  \
 	"rotldi 0,0,61 ; rotldi 0,0,51\n\t" "or 1,1,1\n\t"  \
 	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
 	"cc", "memory", "r3", "r4"); _zzq_result; })
 
 #define CU_GETCTR1()	\
-	__extension__ ({ unsigned long long int _zzq_args[6]; \
-	unsigned long long int _zzq_result; unsigned long long int* \
-	_zzq_ptr; _zzq_args[0] = (unsigned long long \
-	int)(0x43550002); _zzq_args[1] = (unsigned long long \
-	int)(0); _zzq_args[2] = (unsigned long long int)(0); \
-	_zzq_args[3] = (unsigned long long int)(0); _zzq_args[4] = \
-	(unsigned long long int)(0); _zzq_args[5] = (unsigned long \
-	long int)(0); _zzq_ptr = _zzq_args; __asm__ volatile( \
-	"mr 3,%1\n\t" "mr 4,%2\n\t"  \
+	__extension__ ({ unsigned long int _zzq_args[6]; unsigned \
+	long int _zzq_result; unsigned long int* _zzq_ptr; \
+	_zzq_args[0] = (unsigned long int)(0x43550002); \
+	_zzq_args[1] = (unsigned long int)(0); _zzq_args[2] = \
+	(unsigned long int)(0); _zzq_args[3] = (unsigned long \
+	int)(0); _zzq_args[4] = (unsigned long int)(0); \
+	_zzq_args[5] = (unsigned long int)(0); _zzq_ptr = \
+	_zzq_args; __asm__ volatile("mr 3,%1\n\t" "mr 4,%2\n\t" \
 	"rotldi 0,0,3  ; rotldi 0,0,13\n\t"  \
 	"rotldi 0,0,61 ; rotldi 0,0,51\n\t" "or 1,1,1\n\t"  \
 	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
 	"cc", "memory", "r3", "r4"); _zzq_result; })
 
 #define CU_SETCTR2PTR(PTR)	\
-	do { (void) __extension__ ({ unsigned long long int \
-	_zzq_args[6]; unsigned long long int _zzq_result; unsigned \
-	long long int* _zzq_ptr; _zzq_args[0] = (unsigned long long \
-	int)((0x43550003)); _zzq_args[1] = (unsigned long long \
-	int)((PTR)); _zzq_args[2] = (unsigned long long int)((0)); \
-	_zzq_args[3] = (unsigned long long int)((0)); _zzq_args[4] \
-	= (unsigned long long int)((0)); _zzq_args[5] = (unsigned \
-	long long int)((0)); _zzq_ptr = _zzq_args; __asm__ \
-	volatile("mr 3,%1\n\t" "mr 4,%2\n\t"  \
+	do { (void) __extension__ ({ unsigned long int \
+	_zzq_args[6]; unsigned long int _zzq_result; unsigned long \
+	int* _zzq_ptr; _zzq_args[0] = (unsigned long \
+	int)((0x43550003)); _zzq_args[1] = (unsigned long \
+	int)((PTR)); _zzq_args[2] = (unsigned long int)((0)); \
+	_zzq_args[3] = (unsigned long int)((0)); _zzq_args[4] = \
+	(unsigned long int)((0)); _zzq_args[5] = (unsigned long \
+	int)((0)); _zzq_ptr = _zzq_args; __asm__ volatile( \
+	"mr 3,%1\n\t" "mr 4,%2\n\t"  \
 	"rotldi 0,0,3  ; rotldi 0,0,13\n\t"  \
 	"rotldi 0,0,61 ; rotldi 0,0,51\n\t" "or 1,1,1\n\t"  \
 	"mr %0,3" : "=b" (_zzq_result) : "b" (0), "b" (_zzq_ptr) : \
@@ -408,8 +407,7 @@
 	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
 	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
 	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "cc","memory", "t3", "t4"); _zzq_result; \
-	})
+	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
 
 #define CU_GETCTR1()	\
 	__extension__ ({ volatile unsigned int _zzq_args[6]; \
@@ -422,8 +420,7 @@
 	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
 	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
 	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "cc","memory", "t3", "t4"); _zzq_result; \
-	})
+	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
 
 #define CU_SETCTR2PTR(PTR)	\
 	do { (void) __extension__ ({ volatile unsigned int \
@@ -436,8 +433,8 @@
 	"srl $0, $0, 13\n\t" "srl $0, $0, 29\n\t"  \
 	"srl $0, $0, 3\n\t" "srl $0, $0, 19\n\t"  \
 	"or $13, $13, $13\n\t" "move %0, $11\n\t" : "=r" \
-	(_zzq_result) : "r" (0), "r" (&_zzq_args[0]) : \
-	"cc","memory", "t3", "t4"); _zzq_result; }); } while (0)
+	(_zzq_result) : "r" (0), "r" (&_zzq_args[0]) : "$11", \
+	"$12"); _zzq_result; }); } while (0)
 
 #else
 #define CU_CLRCTR1() 0
