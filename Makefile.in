@@ -104,12 +104,9 @@ DIST_COMMON = $(top_srcdir)/Makefile.tool.am \
 # On Android we must ask for non-executable stack, not sure why.
 @VGCONF_PLATFORMS_INCLUDE_ARM_LINUX_TRUE@@VGCONF_PLATVARIANT_IS_ANDROID_TRUE@am__append_4 = -Wl,-z,noexecstack
 noinst_PROGRAMS = cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@$(EXEEXT) \
-	$(am__EXEEXT_1) \
-	vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so$(EXEEXT) \
-	$(am__EXEEXT_2)
+	$(am__EXEEXT_1)
 @VGCONF_HAVE_PLATFORM_SEC_TRUE@am__append_5 = cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@
 @VGCONF_HAVE_PLATFORM_SEC_FALSE@cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_DEPENDENCIES =
-@VGCONF_HAVE_PLATFORM_SEC_TRUE@am__append_6 = vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
 subdir = cputil
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -120,7 +117,6 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @VGCONF_HAVE_PLATFORM_SEC_TRUE@am__EXEEXT_1 = cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@$(EXEEXT)
-@VGCONF_HAVE_PLATFORM_SEC_TRUE@am__EXEEXT_2 = vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__objects_1 =  \
 	cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@-cu_main.$(OBJEXT)
@@ -134,16 +130,6 @@ am__objects_2 =  \
 @VGCONF_HAVE_PLATFORM_SEC_TRUE@	$(am__objects_2)
 cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_OBJECTS =  \
 	$(am_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_OBJECTS)
-vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_SOURCES =  \
-	vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.c
-vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_OBJECTS =  \
-	vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.$(OBJEXT)
-vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_LDADD = $(LDADD)
-vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_SOURCES =  \
-	vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.c
-vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_OBJECTS =  \
-	vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.$(OBJEXT)
-vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_LDADD = $(LDADD)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -206,13 +192,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_SOURCES) \
-	$(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES) \
-	vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.c \
-	vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.c
+	$(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES)
 DIST_SOURCES = $(cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_SOURCES) \
-	$(am__cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES_DIST) \
-	vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.c \
-	vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.c
+	$(am__cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -902,7 +884,6 @@ cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LINK = \
 @VGCONF_HAVE_PLATFORM_SEC_TRUE@	$(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CFLAGS) \
 @VGCONF_HAVE_PLATFORM_SEC_TRUE@	$(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_LDFLAGS)
 
-@VGCONF_OS_IS_DARWIN_TRUE@noinst_DSYMS = $(noinst_PROGRAMS)
 all: all-recursive
 
 .SUFFIXES:
@@ -949,14 +930,6 @@ cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@$(EXEEXT): $(cputil_@VGCONF_ARCH_PRI@_@VGCON
 cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@$(EXEEXT): $(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_OBJECTS) $(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_DEPENDENCIES) $(EXTRA_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_DEPENDENCIES) 
 	@rm -f cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@$(EXEEXT)
 	$(AM_V_GEN)$(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_LINK) $(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_OBJECTS) $(cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_LDADD) $(LIBS)
-
-vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so$(EXEEXT): $(vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_OBJECTS) $(vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_DEPENDENCIES) $(EXTRA_vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_DEPENDENCIES) 
-	@rm -f vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_OBJECTS) $(vgpreload_cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_LDADD) $(LIBS)
-
-vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so$(EXEEXT): $(vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_OBJECTS) $(vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_DEPENDENCIES) $(EXTRA_vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_DEPENDENCIES) 
-	@rm -f vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_OBJECTS) $(vgpreload_cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@_so_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
@@ -1001,8 +974,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cputil_@VGCONF_ARCH_PRI@_@VGCONF_OS@-cu_main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cputil_@VGCONF_ARCH_SEC@_@VGCONF_OS@-cu_main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1445,8 +1416,21 @@ uninstall-local: uninstall-noinst_PROGRAMS uninstall-noinst_DSYMS
 
 cputil:
 	echo "#!/bin/sh" >cputil
-	echo "$prefix/lib/vg -q" '--tool=cputil "$@"' >>cputil
+	echo "$(prefix)/lib/vg -q" '--tool=cputil "$@"' >>cputil
 	chmod +x cputil
+
+#----------------------------------------------------------------------------
+# vgpreload_cputil-<platform>.so
+#----------------------------------------------------------------------------
+
+#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so
+#if VGCONF_HAVE_PLATFORM_SEC
+#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
+#endif
+
+#if VGCONF_OS_IS_DARWIN
+#noinst_DSYMS = $(noinst_PROGRAMS)
+#endif
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -18,7 +18,7 @@ bin_SCRIPTS = cputil
 
 cputil:
 	echo "#!/bin/sh" >cputil
-	echo "$prefix/lib/vg -q" '--tool=cputil "$@"' >>cputil
+	echo "$(prefix)/lib/vg -q" '--tool=cputil "$@"' >>cputil
 	chmod +x cputil
 
 #----------------------------------------------------------------------------
@@ -76,13 +76,13 @@ endif
 # vgpreload_cputil-<platform>.so
 #----------------------------------------------------------------------------
 
-noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so
-if VGCONF_HAVE_PLATFORM_SEC
-noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
-endif
+#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_PRI@-@VGCONF_OS@.so
+#if VGCONF_HAVE_PLATFORM_SEC
+#noinst_PROGRAMS += vgpreload_cputil-@VGCONF_ARCH_SEC@-@VGCONF_OS@.so
+#endif
 
-if VGCONF_OS_IS_DARWIN
-noinst_DSYMS = $(noinst_PROGRAMS)
-endif
+#if VGCONF_OS_IS_DARWIN
+#noinst_DSYMS = $(noinst_PROGRAMS)
+#endif
 
 

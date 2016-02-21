@@ -4,3 +4,4 @@ Makefile
 cputil-*
 .deps
 *.pyc
+cputil
