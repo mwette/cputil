@@ -1,0 +1,28 @@
+<?xml version="1.0"?> <!-- -*- sgml -*- -->
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<!--
+  TeX > Docbook > Turd
+  -->
+
+<chapter id="xp-manual" xreflabel="xprof">
+
+<title>Xprof: The Execution Profiler</title>
+
+<para>To use this tool, you must specify
+<option>--tool=xprof</option> on the Valgrind
+command line.</para>
+
+<sect1 id="ms-manual.overview" xreflabel="Overview">
+<title>Overview</title>
+
+<para>While other Valgrind tools deal with memory, Xprof deals with 
+clock cycles.  It instruments code to count clock cycles for each
+instruction.  The value is that the counting is controllable.
+</para>
+
+</sect1>
+
+</chapter>
+
+<!-- last line of xp-manual.xml -->
