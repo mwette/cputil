@@ -2,7 +2,7 @@
 #
 # gen_tables.py - generate blank table or load (default) table into xp_main.c
 #
-# Copyright (C) 2013 Matthew R. Wette
+# Copyright (C) 2013,2016 Matthew R. Wette
 # mwette@alumni.caltech.edu
 #
 # This program is free software; you can redistribute it and/or
@@ -225,15 +225,15 @@ if True:
     for opt in opts:
         k,v = opt
         if k == "-d":
-            print "dumping to xp_zero.cnt.new ..."
+            print "dumping to cuts/zero.cut.new ..."
             get_all_enums()
-            dump_blank_counts(ld_enums, op_enums, "xp_zero.cnt.new")
+            dump_blank_counts(ld_enums, op_enums, "cuts/zero.cut.new")
     else:
         print "updating cu_main.c ..."
         get_all_enums()
         pairs = read_counts("cu_def.cnt", ld_enums, op_enums)
         replace_in_code(pairs, "cu_main.c", "count_tables", fill_all)
-        #lpairs, opairs = read_counts("cu_def.cnt", ld_enums, op_enums)
+        #lpairs, opairs = read_counts("cuts/default.cut", ld_enums, op_enums)
         #replace_in_code((lpairs,opairs), "cu_main.c", "count_tables", fill_all)
         res = move_if_changed("cu_main.c")
         if res:
