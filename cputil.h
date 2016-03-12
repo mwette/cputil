@@ -5,41 +5,31 @@
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307, USA.
-
-   The GNU General Public License is contained in the file COPYING.
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
  */
 #ifndef __cputil_h__
 #define __cputil_h__
 
 /* Use the macros CU_REGTHR, CU_CLRCTR, CU_GETCTR and CU_GETMUL like the 
  * following function declarations:
- *       void CU_REGTHR();               - register the calling thread
- *       void CU_CLRCTR();               - zero the counter
- *       unsigned long CU_GETCTR();      - return counter value
- *       unsigned long CU_GETDIV();      - return the divisor
+ *       void CPUTIL_REG_THR();            - register the calling thread
+ *       void CPUTIL_CLR_CTR();            - zero the counter
+ *       unsigned long CPUTIL_GET_CTR();   - return counter value
+ *       unsigned long CPUTIL_GET_DIV();   - return the divisor
  *
  * Example:
  *       unsigned long foo_cnt;
  *       unsigned long foo_div;
- *       CU_CLRCTR1();
+ *       CPUTIL_REG_THR();
+ *       
+ *       foo_cnt = CPUTIL_GET_CTR();
  *       foo();
- *       foo_cnt = CU_GETCTR();
- *       foo_div = CU_GETDIV();
+ *       foo_cnt = CPUTIL_GET_CTR();
+ *       foo_div = CPUTIL_GET_DIV();
  *       printf("counts=%u/%d\n", foo_cnt, foo_div);
  *
- * If any counter grows above ULONG_MAX/2 cputil stops counting and generates
+ * If any counter grows above ULONG_MAX>>1 cputil stops counting and generates
  * an error message after the client program completes execution.
  */
 

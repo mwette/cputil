@@ -18,7 +18,7 @@ bin_SCRIPTS = cputil
 
 cputil:
 	echo "#!/bin/sh" >cputil
-	echo "$(prefix)/lib/vg -q" '--tool=cputil "$@"' >>cputil
+	echo "$(pkglibdir)/vg -q" '--tool=cputil "$$@"' >>cputil
 	chmod +x cputil
 
 #----------------------------------------------------------------------------

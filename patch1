@@ -15,7 +15,7 @@ ed ../configure <<'EndOfInput'
 /^cat >confcache 
 i
 ac_config_files="$ac_config_files cputil/Makefile cputil/tests/Makefile"
-
+ac_config_files="$ac_config_files cputil/mindist"
 .
 w
 q

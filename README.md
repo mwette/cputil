@@ -32,7 +32,17 @@ To install:
    ```
 
 4. In the valgrind top direcotry run configure, make and install
+   ```
+   $ ./configure --prefix=/usr/local
+   $ mkdir -p /var/tmp/bindist
+   $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
+   $ sh cputil/mindist /usr/local lib/cputil
+   ```
 
+5. If you want a minimum distribution do this:
+   ```
+   $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
+   ```
 
 ## Notes
 
@@ -56,26 +66,9 @@ to highest bb number shown.
 
 ### Threads
 
-No support for multi-threaded code.   Here are some calls provided by VG:
+Support for multi-threaded code has been added.
 
-```
-  VG_(get_running_tid)() => ThreadId
-  VG_(is_running_thread)(tid) => bool
 
-```
-could be used to limit counting to only one thread.  Or we could have
-```
-   REG_CTR(ix, tid)
-   CLR_CTR(ix)
-   GET_CTR(ix)
-```
-but if we don't have the tid, then always is self.
-```
-   REG_CTR(ix)
-   CLR_CTR(ix)
-   GET_CTR(ix)
-```
-or just have REG_CTR() register next available with current TID !
+### Demo
 
-if no threading tid is VG_INVALID_THREADID
-
+Look in cputil/tests/demo1.c

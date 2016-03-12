@@ -5,18 +5,18 @@
   TeX > Docbook > Turd
   -->
 
-<chapter id="xp-manual" xreflabel="xprof">
+<chapter id="cu-manual" xreflabel="cputil">
 
-<title>Xprof: The Execution Profiler</title>
+<title>CPUTIL: Estimating CPU Utilization</title>
 
 <para>To use this tool, you must specify
-<option>--tool=xprof</option> on the Valgrind
+<option>--tool=cputil</option> on the Valgrind
 command line.</para>
 
 <sect1 id="ms-manual.overview" xreflabel="Overview">
 <title>Overview</title>
 
-<para>While other Valgrind tools deal with memory, Xprof deals with 
+<para>While other Valgrind tools deal with memory, Cputil deals with 
 clock cycles.  It instruments code to count clock cycles for each
 instruction.  The value is that the counting is controllable.
 </para>
@@ -25,4 +25,4 @@ instruction.  The value is that the counting is controllable.
 
 </chapter>
 
-<!-- last line of xp-manual.xml -->
+<!-- last line of cu-manual.xml -->
