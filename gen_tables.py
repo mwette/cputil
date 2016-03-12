@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# gen_tables.py - generate blank table or load (default) table into xp_main.c
+# gen_tables.py - generate blank table or load (default) table into cu_main.c
 #
 # Copyright (C) 2013,2016 Matthew R. Wette
 # mwette@alumni.caltech.edu
@@ -22,7 +22,7 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
-# v130302b
+# v130311a
 
 import sys, os, re
 from string import join, whitespace
@@ -123,7 +123,7 @@ def read_counts(filename, lenums, oenums):
     nld = len(lenums)
     nop = len(oenums)
     tdict = {}
-    ld_pairs = []
+    ty_pairs = []
     op_pairs = []
     #
     f0 = open(filename, "r")
@@ -149,20 +149,20 @@ def read_counts(filename, lenums, oenums):
             break
         l0 = f0.readline()
         pass
-    ld_pairs = [(lenums[0], "0")]
+    ty_pairs = [(lenums[0], "0")]
     i = 1                               # skip INVALID
     while l0:
         c,s = l0.split()
         if s != lenums[i]:
             raise Exception, "mismatch: " + s
-        ld_pairs.append((s,c))
+        ty_pairs.append((s,c))
         i = i + 1
         if i >= nld:
             break
         l0 = f0.readline()
-    if len(ld_pairs) != nld:
+    if len(ty_pairs) != nld:
         raise Exception, "count mismatch"
-    tdict['ld_pairs'] = ld_pairs
+    tdict['ty_pairs'] = ty_pairs
     # read operations
     l0 = f0.readline()
     while l0:
@@ -201,7 +201,7 @@ def fill_names(tag, names, f1):
     f1.write("#define NUM_%s %d\n" % (tag.upper(), len(names)))
     if not names[0].endswith("INVALID"):
         raise Exception, "expecting INVALID as first element"
-    f1.write("static Char *xp_%s_names[] = {\n  " % (tag,))
+    f1.write("static const HChar *cu_%s_names[] = {\n  " % (tag,))
     col = 2
     for e in names:
         col = write_w_fill(f1, col, " \"%s\"," % (e,))
@@ -211,14 +211,14 @@ def fill_counts(tag, vals, f1):
     """
     Write out count array.
     """
-    f1.write("static UShort xp_%s_counts[] = {\n  " % (tag,))
+    f1.write("static UShort cu_%s_counts[] = {\n  " % (tag,))
     col = 2
     for c in vals:
         col = write_w_fill(f1, col, " %s," % (c,))
     f1.write("\n};\n")
 
 def fill_all(tdict, f1):
-    lpairs = tdict['ld_pairs']
+    lpairs = tdict['ty_pairs']
     opairs = tdict['op_pairs']
     divizr = tdict['divisor']
     fill_names("op", map(lambda p: p[0], opairs), f1)
@@ -229,19 +229,19 @@ def fill_all(tdict, f1):
     f1.write("\n")
     fill_counts("ld", map(lambda p: p[1], lpairs), f1)
     f1.write("\n")
-    f1.write("static Int cu_divisor = %d;\n" % divizr)
+    f1.write("static UWord cu_divisor = %s;\n" % divizr)
 
 # ========================================
 
-ld_enums = None
+ty_enums = None
 op_enums = None
 
 def get_all_enums():
-    global ld_enums, op_enums
+    global ty_enums, op_enums
     if not op_enums:
         op_enums = get_enums("Iop")
-    if not ld_enums:
-        ld_enums = get_enums("Ity")
+    if not ty_enums:
+        ty_enums = get_enums("Ity")
 
 from getopt import getopt
 
@@ -252,11 +252,12 @@ if True:
         if k == "-d":
             print "dumping to cuts/zero.cut.new ..."
             get_all_enums()
-            dump_blank_counts(ld_enums, op_enums, "cuts/zero.cut.new")
+            dump_blank_counts(ty_enums, op_enums, "cuts/zero.cut.new")
+            sys.exit(0)
     else:
         print "updating cu_main.c ..."
         get_all_enums()
-        tdict = read_counts("cuts/default.cut", ld_enums, op_enums)
+        tdict = read_counts("cuts/default.cut", ty_enums, op_enums)
         replace_in_code(tdict, "cu_main.c", "count_tables", fill_all)
         res = move_if_changed("cu_main.c")
         if res:
