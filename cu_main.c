@@ -34,7 +34,7 @@
 #include "pub_tool_threadstate.h"
 #include "cputildefs.h"
 
-static const HChar cu_version[] = "v160312a";
+static const HChar cu_version[] = "v160312b";
 
 /*------------------------------------------------------------*/
 /*--- Instrumentation                                      ---*/
@@ -521,11 +521,11 @@ static void update_clkcnt(UInt lclkcnt)
       return;
    }
    clkcnt = cu_cntr[ix].cnt + lclkcnt;
-   if (cu_cntr[ix].cnt > (ULONG_MAX>>1)) {
-      clkcnt = (ULONG_MAX>>1);
+   if (clkcnt > (ULONG_MAX>>1)) {
+      cu_cntr[ix].cnt = (ULONG_MAX>>1);
       cu_cntr[ix].full = True;
    } else {
-      cu_cntr[ix].cnt += clkcnt;
+      cu_cntr[ix].cnt = clkcnt;
    }
 }
 

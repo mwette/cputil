@@ -19,9 +19,10 @@ main()
   unsigned long i;
   double z;
 
+  CU_REGTHR();
+
   z = foo(1.2, 3.6);
 
-  printf("method 1:\n");
   prev = 0; curr = 0;
   for (i = 0; i < 5; i++) {
     CU_CLRCTR();
