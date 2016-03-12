@@ -39,7 +39,7 @@ typedef
  * void CU_REGTHR(void);
  * void CU_CLRCTR(void);
  * unsigned long CU_GETCTR();
- * int CU_GETDIV();
+ * unsigned long CU_GETDIV();
  */
 
 #define CU_REGTHR()                     \

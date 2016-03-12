@@ -28,16 +28,16 @@
  *       void CU_REGTHR();               - register the calling thread
  *       void CU_CLRCTR();               - zero the counter
  *       unsigned long CU_GETCTR();      - return counter value
- *       int CU_GETMUL();                - return multiplier
+ *       unsigned long CU_GETDIV();      - return the divisor
  *
  * Example:
  *       unsigned long foo_cnt;
- *       int mult;
+ *       unsigned long foo_div;
  *       CU_CLRCTR1();
  *       foo();
  *       foo_cnt = CU_GETCTR();
- *       mult = CU_GETMUL();
- *       printf("counts=%u/%d\n", foo_cnt, mult);
+ *       foo_div = CU_GETDIV();
+ *       printf("counts=%u/%d\n", foo_cnt, foo_div);
  *
  * If any counter grows above ULONG_MAX/2 cputil stops counting and generates
  * an error message after the client program completes execution.
@@ -46,7 +46,7 @@
 #define CPUTIL_REG_THR     CU_REGTHR
 #define CPUTIL_CLR_CTR     CU_CLRCTR
 #define CPUTIL_GET_CTR     CU_GETCTR
-#define CPUTIL_GET_MUL     CU_GETMUL
+#define CPUTIL_GET_DIV     CU_GETDIV
 
 /* backward compatiblity */
 #define CPUTIL_CLR_CTR1    CU_CLRCTR

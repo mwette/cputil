@@ -95,6 +95,8 @@ def dump_blank_counts(lenums, oenums, filename):
     f1 = open(filename, 'w')
     f1.write("# valgrind/cputil count table\n")
     f1.write("#\n")
+    f1.write("1\tdivisor\n")
+    f1.write("#\n")
     f1.write("# load types\n")
     for e in lenums[1:]:
         f1.write("%d\t%s\n" % (0, e))
@@ -102,6 +104,9 @@ def dump_blank_counts(lenums, oenums, filename):
     for e in oenums[1:]:
         f1.write("%d\t%s\n" % (0, e))
     f1.close()
+    pass
+
+propl = ('divisor')
 
 def read_counts(filename, lenums, oenums):
     """
@@ -117,12 +122,24 @@ def read_counts(filename, lenums, oenums):
     """
     nld = len(lenums)
     nop = len(oenums)
+    tdict = {}
     ld_pairs = []
     op_pairs = []
     #
     f0 = open(filename, "r")
-    #
     l0 = f0.readline()
+    # read properties
+    while l0:
+        if l0[0] == '#':
+            l0 = f0.readline()
+            continue
+        c,s = l0.split()
+        if s not in propl:
+            break
+        tdict[s] = c
+        l0 = f0.readline()
+        pass
+    # read load statements
     while l0:
         if l0[0] == '#':
             l0 = f0.readline()
@@ -131,6 +148,7 @@ def read_counts(filename, lenums, oenums):
         if s == lenums[1]:              # skip INVALID = lenums[0]
             break
         l0 = f0.readline()
+        pass
     ld_pairs = [(lenums[0], "0")]
     i = 1                               # skip INVALID
     while l0:
@@ -144,7 +162,8 @@ def read_counts(filename, lenums, oenums):
         l0 = f0.readline()
     if len(ld_pairs) != nld:
         raise Exception, "count mismatch"
-    #
+    tdict['ld_pairs'] = ld_pairs
+    # read operations
     l0 = f0.readline()
     while l0:
         if l0[0] == '#':
@@ -165,13 +184,15 @@ def read_counts(filename, lenums, oenums):
         if i >= nop:
             break
         l0 = f0.readline()
+        pass
     if len(op_pairs) != nop:
         pdb.set_trace()
         raise Exception, "count mismatch"
+    tdict['op_pairs'] = op_pairs
     #
     f0.close()
     #
-    return (ld_pairs, op_pairs)
+    return tdict
 
 def fill_names(tag, names, f1):
     """
@@ -196,8 +217,10 @@ def fill_counts(tag, vals, f1):
         col = write_w_fill(f1, col, " %s," % (c,))
     f1.write("\n};\n")
 
-def fill_all(pairs, f1):
-    lpairs, opairs = pairs
+def fill_all(tdict, f1):
+    lpairs = tdict['ld_pairs']
+    opairs = tdict['op_pairs']
+    divizr = tdict['divisor']
     fill_names("op", map(lambda p: p[0], opairs), f1)
     f1.write("\n")
     fill_counts("op", map(lambda p: p[1], opairs), f1)
@@ -205,6 +228,8 @@ def fill_all(pairs, f1):
     fill_names("ld", map(lambda p: p[0], lpairs), f1)
     f1.write("\n")
     fill_counts("ld", map(lambda p: p[1], lpairs), f1)
+    f1.write("\n")
+    f1.write("static Int cu_divisor = %d;\n" % divizr)
 
 # ========================================
 
@@ -231,10 +256,8 @@ if True:
     else:
         print "updating cu_main.c ..."
         get_all_enums()
-        pairs = read_counts("cu_def.cnt", ld_enums, op_enums)
-        replace_in_code(pairs, "cu_main.c", "count_tables", fill_all)
-        #lpairs, opairs = read_counts("cuts/default.cut", ld_enums, op_enums)
-        #replace_in_code((lpairs,opairs), "cu_main.c", "count_tables", fill_all)
+        tdict = read_counts("cuts/default.cut", ld_enums, op_enums)
+        replace_in_code(tdict, "cu_main.c", "count_tables", fill_all)
         res = move_if_changed("cu_main.c")
         if res:
             print "cu_main.c changed"

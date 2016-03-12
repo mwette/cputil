@@ -39,6 +39,11 @@ static const HChar cu_version[] = "v160121a";
 /*--- Instrumentation                                      ---*/
 /*------------------------------------------------------------*/
 
+/* TODO: explaint the count tables
+ * The counts can be with refernece to a divisor to get more resolution.
+ * For example if, on average, an operation is 1.5 clocks, then the table
+ * could use a divisor of 10 and define the operation count to be 15.
+ */
 /* count_tables: beg */
 #define NUM_OP 828
 static const HChar *cu_op_names[] = {
@@ -313,8 +318,12 @@ static const HChar *cu_ld_names[] = {
 static UShort cu_ld_counts[] = {
    0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 };
+
+static unsigned long cu_divisor = 1;
 /* count_tables: end */
 
+static unsigned long cu_clkcnt = 0;
+static Bool cu_counter_exhausted = False;
 
 /* This routine is called during instrumentation to count up clock cycles
  * for a particular instruction within a superblock.
@@ -353,35 +362,36 @@ static Int cu_expr_cnt(IRExpr *expr)
    }
 }
 
-/* There was a concern on the valgrind-develop list (later rescinded) that
- * using method 1 (see updating of m1_count) below is broken.  The argument
- * was that the client program may require two instructions to read the
- * counter.  After the first instruction, the VEX may increment the counter
- * variable, resulting in a bogus value read by the client's second
- * instruction.  The claim was rescinded once I explained that the updates
- * were only happening at the exit of the superblock.  (I now also update
- * just before a dirty call.)
- * Note: I don't think volatile is needed for m2_clkcntptr, because the 
- * scope of the call will not allow changes.
+/*
+ * for multi-thread support have a tble with count and tid
+#define MAX_ID 20
+static struct { ThreadId tid; unsigned long cnt; } cntr[MAX_ID];
+ * and use
+   for (ix = 0; ix < MAX_ID; ix++) {
+      if (VG_(is_running_thread)(cntr[ix].tid)) {
+         cntr[ix].cnt += xxx;
+      } 
+      if (cntr[ix].tid == VG_(master_tid)) {
+         break;
+      }
+   }
+ * don't allow master_tid to be counted, we use that as a marker
+ * But if single threaded that breaks.  Or make master always the last!
+ * NO! make VG_INVALID_THREADID the last
+int reg_ctr() {
+   ix = ncntr++;
+   cntr[ix+1] = cntr[ix];		/+ always make master the last +/
+   cntr[ix].tid = VG_(get_running_tid());
+   cntr[ix].cnt = 0;
+}
  */
-static Bool m1_used = False;
-static unsigned long m1_clkcnt = 0;
-static Bool m2_used = False;
-static /*volatile*/ unsigned long * /*volatile*/ m2_clkcntptr = 0;
-static Bool counter_exhausted = False;
 
 static void update_clkcnt(UInt lclkcnt)
 {
-   if (m1_clkcnt > LONG_MAX/2) {
-      if (m1_used) counter_exhausted = True;
+   if (cu_clkcnt > LONG_MAX/2) {
+      cu_counter_exhausted = True;
    } else {
-      m1_clkcnt += lclkcnt;
-   }
-   if (m2_clkcntptr == 0) return;	/* no counter specified */
-   if (*m2_clkcntptr > LONG_MAX/2) {
-      if (m2_used) counter_exhausted = True;
-   } else {
-      *m2_clkcntptr += lclkcnt;
+      cu_clkcnt += lclkcnt;
    }
 }
 
@@ -415,6 +425,7 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
    IRSB*      sbOut;
    Int        lastst;			/* last statement instrumented */
    Int        lclkcnt;			/* localized clock count */
+   Int        sclkcnt;			/* statement clock count */
    IRExpr*    expr;
 
    if (gWordTy != hWordTy) {
@@ -436,7 +447,7 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
     * member expressions.  Update user variables at exits.  This does not
     * remove the small number of clock cycles to implement clientrequest.
     */
-   lclkcnt = 1;				/* Count the clocks to branch here. */
+   lclkcnt = cu_divisor;	/* Count the clocks to branch here. */
    for (/*use current i*/; i < sbIn->stmts_used; i++) {
       IRStmt* st = sbIn->stmts[i];
       if (!st || st->tag == Ist_NoOp) continue;
@@ -452,39 +463,71 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_Put:			/* put to register */
+	    sclkcnt = 0;
 	    expr = st->Ist.Put.data;
-	    lclkcnt += cu_expr_cnt(expr);
-            MARK_COUNT(cu_expr_cnt(expr));
+	    sclkcnt += cu_expr_cnt(expr);
+            MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_PutI:			/* put to register, indirect */
+	    sclkcnt = 0;
 	    expr = st->Ist.PutI.details->data;
-	    lclkcnt += cu_expr_cnt(expr);
-            MARK_COUNT(cu_expr_cnt(expr));
+	    sclkcnt += cu_expr_cnt(expr);
+            MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_WrTmp:		/* write to temp */
+	    sclkcnt = 0;
 	    expr = st->Ist.WrTmp.data;
-	    lclkcnt += cu_expr_cnt(expr);
-	    MARK_COUNT(cu_expr_cnt(expr));
+	    sclkcnt += cu_expr_cnt(expr);
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_Store:		/* store to memory */
+	    sclkcnt = 0;
 	    expr  = st->Ist.Store.data;
-	    lclkcnt += cu_expr_cnt(expr);
-	    lclkcnt += 1; 		/* Add 1 clock for the store. */
-	    MARK_COUNT(cu_expr_cnt(expr)+1);
+	    sclkcnt += cu_expr_cnt(expr);
+	    sclkcnt += cu_divisor;    /* Add 1 clock for the store. */
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
+	 case Ist_LoadG:		/* guarded load */
+	    sclkcnt = 0;
+	    expr = st->Ist.LoadG.guard;
+	    sclkcnt += cu_expr_cnt(expr);
+	    expr = st->Ist.LoadG.guard;
+	    sclkcnt += cu_expr_cnt(expr);
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
+            addStmtToIRSB( sbOut, st );
+	    break;
+	 case Ist_StoreG:		/* guarded store */
+	    sclkcnt = 0;
+	    expr  = st->Ist.StoreG.guard;
+	    sclkcnt += cu_expr_cnt(guard);
+	    expr  = st->Ist.StoreG.data;
+	    sclkcnt += cu_expr_cnt(expr);
+	    sclkcnt += cu_divisor;    /* Add 1 clock for the store. */
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
+            addStmtToIRSB( sbOut, st );
+	    break;
          case Ist_CAS:			/* compare and swap */
-	    lclkcnt += 1;		
-	    MARK_COUNT(1);
+	    sclkcnt = cu_divisor;
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;		
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_LLSC:			/* load from memory */
+	    sclkcnt = 0;
 	    expr = st->Ist.LLSC.storedata;
-	    lclkcnt += cu_expr_cnt(expr);
-	    MARK_COUNT(cu_expr_cnt(expr));
+	    sclkcnt += cu_expr_cnt(expr);
+	    MARK_COUNT(sclkcnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_Dirty:		/* instrumentation call  */
@@ -500,13 +543,16 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_MBE:			/* memory bus event */
-	    lclkcnt += 1;
-	    MARK_COUNT(1);
+	    /* Just assume one clock for now */
+	    sclkcnt = cu_divisor;
+	    MARK_COUNT(sclkdnt);
+	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_Exit:			/* exit superblock, add clocks? */
 	    /* This is the hook to add counts to user's counter. */
             /* \todo: Add counts for branching. ??? */
+	    sclkcnt = 0;
 	    expr = IRExpr_Const(IRConst_U64(lclkcnt));
 	    di = unsafeIRDirty_0_N( 0, "update_clkcnt", 
 				    VG_(fnptr_to_fnentry)( &update_clkcnt ),
@@ -516,6 +562,7 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
          default:
+	    VG_(printf)("cu_main: st->tag=%d\n", st->tag);
             tl_assert(0);
       }
       lastst = st->tag;
@@ -540,29 +587,31 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
 static Bool cu_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
 {
    //VG_(printf)("cu_handle_client_request called\n");
-   if (!VG_IS_TOOL_USERREQ('X','P',arg[0])
-       && VG_USERREQ__CU_CLRCTR1 != arg[0]
-       && VG_USERREQ__CU_GETCTR1 != arg[0]
-       && VG_USERREQ__CU_SETCTR2PTR != arg[0])
+   if (!VG_IS_TOOL_USERREQ('C','U',arg[0])
+       && VG_USERREQ__CU_REGTHR != arg[0]
+       && VG_USERREQ__CU_CLRCTR != arg[0]
+       && VG_USERREQ__CU_GETCTR != arg[0]
+       && VG_USERREQ__CU_GETDIV != arg[0])
       return False;
 
+   VG_(printf)("  CU: tid=%d\n", VG_(get_running_tid)());
    switch (arg[0]) {
-      case VG_USERREQ__CU_CLRCTR1:
-         //VG_(printf)("  CU_CLRCTR1()\n");
-         m1_clkcnt = 0;
-         m1_used = True;
+      case VG_USERREQ__CU_REGTHR:
+         VG_(printf)("  CU_REGTHR() not yet supported\n");
          break;
 
-      case VG_USERREQ__CU_GETCTR1:
-         //VG_(printf)("  CU_GETCTR1(): %lu\n", m1_clkctr);
-         *ret = m1_clkcnt;
-         m1_used = True;
+      case VG_USERREQ__CU_CLRCTR:
+         //VG_(printf)("  CU_CLRCTR()\n");
+         cu_clkcnt = 0;
          break;
 
-      case VG_USERREQ__CU_SETCTR2PTR:
-         //VG_(printf)("  CU_SETCTR2PTR(%p)\n", m2_clkcntptr);
-	 m2_clkcntptr = (unsigned long*) arg[1];
-         m2_used = True;
+      case VG_USERREQ__CU_GETCTR:
+         //VG_(printf)("  CU_GETCTR(): %lu\n", cu_clkcnt);
+         *ret = cu_clkcnt;
+         break;
+
+      case VG_USERREQ__CU_GETDIV:
+         *ret = cu_divisor = 0;
          break;
 
       default:
@@ -670,6 +719,8 @@ static Bool cu_dump_op_table(const HChar *filename)
    }
    VG_(sprintf)(buf, "# valgrind/cputil count table\n#\n");
    VG_(write)(fd, buf, VG_(strlen)(buf));
+   VG_(sprintf)(buf, "%d\tdivisor\n#\n", cu_divisor);
+   VG_(write)(fd, buf, VG_(strlen)(buf));
    VG_(sprintf)(buf, "# load types\n");
    VG_(write)(fd, buf, VG_(strlen)(buf));
    for (i = 1; i < NUM_LD; i++) {
@@ -700,6 +751,27 @@ static Bool cu_load_op_table(const HChar *filename)
       fd = sr_Res(sres);
    }
    ln = 0;
+   /* read multipler */
+   while (ix < 1) {
+      res = cu_readline(fd, buf, 80); ln++;
+      if (res < 0) {
+	 /* error */
+	 return False;
+      }
+      if (buf[0] == '#') continue;	/* Allow #-comments. */
+      sval[39] = 0;
+      res = cu_parse_line(buf, &cval, sval, 40);
+      if (res < 0) {
+	 VG_(umsg)("parse error: line %d\n", ln);
+	 return False;
+      }
+      if (VG_(strcmp)("divisor", sval) != 0) {
+	 VG_(umsg)("bad opname: line %d\n", ln);
+	 return False;
+      }
+      cu_divisor = cval;
+      break;
+   }
    ix = 1;
    while (ix < NUM_LD) {
       res = cu_readline(fd, buf, 80); ln++;
@@ -796,7 +868,7 @@ static Bool cu_process_cmd_line_option(const HChar* arg)
 
 static void cu_fini(Int exitcode)
 {
-   if (counter_exhausted) {
+   if (cu_counter_exhausted) {
       VG_(message)(Vg_UserMsg, "cputil: counter exhausted\n");
    }
 }
@@ -809,9 +881,9 @@ static void cu_pre_clo_init(void)
 {
    VG_(details_name)            ("cputil");
    VG_(details_version)         (cu_version);
-   VG_(details_description)     ("an CPU utilization profiler");
+   VG_(details_description)     ("a CPU utilization profiler");
    VG_(details_copyright_author)(
-      "Copyright (C) 2013-2013, and GNU GPL'd, by Matt Wette.");
+      "Copyright (C) 2013,2016, and GNU GPL'd, by Matt Wette.");
    VG_(details_bug_reports_to)  (VG_BUGS_TO);
    //VG_(details_avg_translation_sizeB) ( 200 );
 
@@ -823,11 +895,8 @@ static void cu_pre_clo_init(void)
                                    cu_print_debug_usage);
    VG_(needs_client_requests)   (cu_handle_client_request);
 
-   m1_clkcnt = 0;
-   m1_used = False;
-   m2_clkcntptr = 0;
-   m2_used = False;
-   counter_exhausted = False;
+   cu_clkcnt = 0;
+   cu_counter_exhausted = False;
 }
 
 VG_DETERMINE_INTERFACE_VERSION(cu_pre_clo_init)
