@@ -394,8 +394,12 @@ static UShort cu_ld_counts[] = {
 static UWord cu_divisor = 1;
 /* count_tables: end */
 
-static UWord cu_clkcnt = 0;
-static Bool cu_counter_exhausted = False;
+#define CU_MAX_THR 32			/* max num threads to track */
+static struct {
+   ThreadId tid;			/* thread ID */
+   UWord cnt;				/* count */
+   Bool full;				/* full -- i.e., exhausted */
+} cu_cntr[CU_MAX_THR];
 
 /* This routine is called during instrumentation to count up clock cycles
  * for a particular instruction within a superblock.
@@ -434,41 +438,99 @@ static Int cu_expr_cnt(IRExpr *expr)
    }
 }
 
-/*
- * for multi-thread support have a tble with count and tid
-#define MAX_ID 20
-static struct { ThreadId tid; UWord cnt; } cntr[MAX_ID];
- * and use
-   for (ix = 0; ix < MAX_ID; ix++) {
-      if (VG_(is_running_thread)(cntr[ix].tid)) {
-         cntr[ix].cnt += xxx;
-      } 
-      if (cntr[ix].tid == VG_(master_tid)) {
-         break;
+/* Find the index into the table of counters for the privided ThreadId.
+ * If nothing found return -1.  
+ */
+static Int find_cntr(ThreadId tid)
+{
+   Int ix;
+   
+   for (ix = 0; ix < CU_MAX_THR; ix++) {
+      if (cu_cntr[ix].tid == tid) {
+	 return ix;
       }
    }
- * don't allow master_tid to be counted, we use that as a marker
- * But if single threaded that breaks.  Or make master always the last!
- * NO! make VG_INVALID_THREADID the last
-int reg_ctr() {
-   ix = ncntr++;
-   cntr[ix+1] = cntr[ix];		/+ always make master the last +/
-   cntr[ix].tid = VG_(get_running_tid());
-   cntr[ix].cnt = 0;
+   return -1;
 }
- */
+
+static void register_thread(ThreadId tid)
+{
+   Int ix, ixp1;
+
+   ix = find_cntr(tid);
+   for (ix = 0; ix < CU_MAX_THR; ix++) {
+      if (cu_cntr[ix].tid == tid) {
+	 /* Already registered. */
+	 return;
+      }
+      if (cu_cntr[ix].tid == VG_INVALID_THREADID) {
+	 /* This is always the last tid in the tracked list. */
+	 break;
+      }
+   }
+   ixp1 = ix + 1;
+   if (ixp1 == CU_MAX_THR) {
+      VG_(printf)("  CU_REGTHR(): too many threads to track\n");
+      return;
+   }
+   cu_cntr[ix+1].tid = cu_cntr[ix].tid;
+   cu_cntr[ix+1].cnt = cu_cntr[ix].cnt;
+   cu_cntr[ix+1].full = cu_cntr[ix].full;
+   cu_cntr[ix].tid = tid;
+   cu_cntr[ix].cnt = 0;
+   cu_cntr[ix].full = False;
+}
+
+static void clr_counter(ThreadId tid)
+{
+   Int ix;
+
+   ix = find_cntr(tid);
+   if (ix < 0) return;
+   cu_cntr[ix].cnt = 0;
+   cu_cntr[ix].full = False;
+}
+
+static UWord get_counter(ThreadId tid)
+{
+   Int ix;
+
+   ix = find_cntr(tid);
+   if (ix < 0) {
+      return 0;
+   } else {
+      return cu_cntr[ix].cnt;
+   }
+}
 
 static void update_clkcnt(UInt lclkcnt)
 {
-   if (cu_clkcnt > LONG_MAX/2) {
-      cu_counter_exhausted = True;
+   ThreadId tid;
+   Int ix;
+   UWord clkcnt;
+   
+   tid = VG_(get_running_tid)();
+   ix = find_cntr(tid);
+   if (ix < 0) {
+      /* Not tracking, so ignore. */
+      return;
+   }
+
+   /* Update.  The counter will get pegged at ULONG_MAX>>1. */
+   if (cu_cntr[ix].full == True) {
+      return;
+   }
+   clkcnt = cu_cntr[ix].cnt + lclkcnt;
+   if (cu_cntr[ix].cnt > (ULONG_MAX>>1)) {
+      clkcnt = (ULONG_MAX>>1);
+      cu_cntr[ix].full = True;
    } else {
-      cu_clkcnt += lclkcnt;
+      cu_cntr[ix].cnt += clkcnt;
    }
 }
 
 #if 0
-/* for development, so we can see counts via --trace-flags */
+/* for debug/development, so we can see counts via --trace-flags */
 static void mark_count(UInt clkcntinc) { }
 #define MARK_COUNT(C)			do {	 \
 	    expr = IRExpr_Const(IRConst_U64(C)); \
@@ -569,20 +631,24 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             break;
 	 case Ist_LoadG:		/* guarded load */
 	    sclkcnt = 0;
-	    //expr = st->Ist.LoadG.guard;
+	    expr = st->Ist.LoadG.details->addr;
+	    sclkcnt += cu_expr_cnt(expr);
+	    //expr = st->Ist.LoadG.details->alt;
 	    //sclkcnt += cu_expr_cnt(expr);
-	    //expr = st->Ist.LoadG.guard;
-	    //sclkcnt += cu_expr_cnt(expr);
+	    expr = st->Ist.LoadG.details->guard;
+	    sclkcnt += cu_expr_cnt(expr);
 	    MARK_COUNT(sclkcnt);
 	    lclkcnt += sclkcnt;
             addStmtToIRSB( sbOut, st );
 	    break;
 	 case Ist_StoreG:		/* guarded store */
 	    sclkcnt = 0;
-	    //expr  = st->Ist.StoreG.guard;
-	    //sclkcnt += cu_expr_cnt(guard);
-	    //expr  = st->Ist.StoreG.data;
-	    //sclkcnt += cu_expr_cnt(expr);
+	    expr  = st->Ist.StoreG.details->addr;
+	    sclkcnt += cu_expr_cnt(expr);
+	    expr  = st->Ist.StoreG.details->data;
+	    sclkcnt += cu_expr_cnt(expr);
+	    expr  = st->Ist.StoreG.details->guard;
+	    sclkcnt += cu_expr_cnt(expr);
 	    sclkcnt += cu_divisor;    /* Add 1 clock for the store. */
 	    MARK_COUNT(sclkcnt);
 	    lclkcnt += sclkcnt;
@@ -666,20 +732,17 @@ static Bool cu_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
        && VG_USERREQ__CU_GETDIV != arg[0])
       return False;
 
-   VG_(printf)("  CU: tid=%d\n", VG_(get_running_tid)());
    switch (arg[0]) {
       case VG_USERREQ__CU_REGTHR:
-         VG_(printf)("  CU_REGTHR() not yet supported\n");
+	 register_thread(tid);
          break;
 
       case VG_USERREQ__CU_CLRCTR:
-         //VG_(printf)("  CU_CLRCTR()\n");
-         cu_clkcnt = 0;
+	 clr_counter(tid);
          break;
 
       case VG_USERREQ__CU_GETCTR:
-         //VG_(printf)("  CU_GETCTR(): %lu\n", cu_clkcnt);
-         *ret = cu_clkcnt;
+         *ret = get_counter(tid);
          break;
 
       case VG_USERREQ__CU_GETDIV:
@@ -940,7 +1003,18 @@ static Bool cu_process_cmd_line_option(const HChar* arg)
 
 static void cu_fini(Int exitcode)
 {
-   if (cu_counter_exhausted) {
+   Int ix;
+   Bool counter_exhausted = False;
+
+   for (ix = 0; ix < CU_MAX_THR; ix++) {
+      if (cu_cntr[ix].tid == VG_INVALID_THREADID) {
+	 break;
+      }
+      if (cu_cntr[ix].full) {
+	 counter_exhausted = True;
+      }
+   }
+   if (counter_exhausted) {
       VG_(message)(Vg_UserMsg, "cputil: counter exhausted\n");
    }
 }
@@ -967,8 +1041,10 @@ static void cu_pre_clo_init(void)
                                    cu_print_debug_usage);
    VG_(needs_client_requests)   (cu_handle_client_request);
 
-   cu_clkcnt = 0;
-   cu_counter_exhausted = False;
+   /* Initialize default counter */
+   cu_cntr[0].tid = VG_INVALID_THREADID;
+   cu_cntr[0].cnt = 0;
+   cu_cntr[0].full = False;
 }
 
 VG_DETERMINE_INTERFACE_VERSION(cu_pre_clo_init)
