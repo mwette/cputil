@@ -1,5 +1,8 @@
 # default valgrind/cputil count table
+#
 # ppc750 rough estimate
+#
+1	divisor
 #
 #	load types
 2	Ity_I1

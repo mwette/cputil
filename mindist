@@ -38,7 +38,7 @@ if [ -f $prefix/include/valgrind/cputil.h ]; then
 #EndOfInput
 fi
 if [ -f $prefix/include/valgrind/libvex_ir.h ]; then
-  mv $prefix/include/valgrind/libvex_ir.h $prefix/lib/
+  cp $prefix/include/valgrind/libvex_ir.h $prefix/lib/
 fi
 rm -rf $prefix/include
 rm -rf $prefix/share

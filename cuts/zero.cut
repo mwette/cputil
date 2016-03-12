@@ -1,5 +1,7 @@
 # valgrind/xprof count table
 #
+1	divisor
+#
 # load types
 0	Ity_I1
 0	Ity_I8

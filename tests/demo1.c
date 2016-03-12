@@ -24,23 +24,12 @@ main()
   printf("method 1:\n");
   prev = 0; curr = 0;
   for (i = 0; i < 5; i++) {
-    CU_CLRCTR1();
+    CU_CLRCTR();
     z = foo(1.2, 3.6);
-    curr = CU_GETCTR1();
+    curr = CU_GETCTR();
     printf("count: %lu\t", curr + prev);
     printf("delta: %lu\n", curr);
     prev = prev + curr;
-  }
-
-  printf("method 2:\n");
-  prev = 0; curr = 0;
-  for (i = 0; i < 5; i++) {
-    CU_SETCTR2PTR(&curr);
-    z = foo(1.2, 3.6);
-    CU_SETCTR2PTR(0);
-    printf("count: %lu\t", curr);
-    printf("delta: %lu\n", curr - prev);
-    prev = curr;
   }
 
   return 0;

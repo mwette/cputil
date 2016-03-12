@@ -1,6 +1,8 @@
 # valgrind/cputil count table
 # rough ppc750, based on PPC750 user manual
-# v130203a
+# v160310a
+#
+1	divisor
 #
 #	load types
 2	Ity_I1

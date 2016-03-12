@@ -28,26 +28,31 @@
 typedef
    enum { 
       VG_USERREQ__CU_NOOP = VG_USERREQ_TOOL_BASE('C','U'),
-      VG_USERREQ__CU_CLRCTR1,
-      VG_USERREQ__CU_GETCTR1,
-      VG_USERREQ__CU_SETCTR2PTR,
-      VG_USERREQ__END_OF_XPROF = VG_USERREQ_TOOL_BASE('C','U') + 256
+      VG_USERREQ__CU_REGTHR,
+      VG_USERREQ__CU_CLRCTR,
+      VG_USERREQ__CU_GETCTR,
+      VG_USERREQ__CU_GETDIV,
+      VG_USERREQ__END_OF_CPUTIL = VG_USERREQ_TOOL_BASE('C','U') + 256
    } Vg_CputilClientRequest;
 
 /* 
- * void CU_CLRCTR1(void);
- * unsigned long CU_GETCTR1();
- * void CU_SETCTR2PTR(unsigned long *ptr);
+ * void CU_REGTHR(void);
+ * void CU_CLRCTR(void);
+ * unsigned long CU_GETCTR();
+ * int CU_GETDIV();
  */
 
-#define CU_CLRCTR1()                     \
-   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_CLRCTR1, 0,0,0,0,0)
+#define CU_REGTHR()                     \
+   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_REGTHR, 0,0,0,0,0)
 
-#define CU_GETCTR1()                     \
-   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_GETCTR1, 0,0,0,0,0)
+#define CU_CLRCTR()                     \
+   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_CLRCTR, 0,0,0,0,0)
 
-#define CU_SETCTR2PTR(PTR)             \
-   VALGRIND_DO_CLIENT_REQUEST_STMT(VG_USERREQ__CU_SETCTR2PTR, PTR, 0,0,0,0)
+#define CU_GETCTR()                     \
+   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_GETCTR, 0,0,0,0,0)
+
+#define CU_GETDIV()                     \
+   VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_GETDIV, 0,0,0,0,0)
 
 #endif
 /* --- last line --- */
