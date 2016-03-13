@@ -35,8 +35,8 @@ To install:
    ```
    $ ./configure --prefix=/usr/local
    $ mkdir -p /var/tmp/bindist
+   $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
-   $ sh cputil/mindist /usr/local lib/cputil
    ```
 
 5. If you want a minimum distribution do this:

@@ -13,11 +13,11 @@ prefix=@prefix@
 srcdist=..
 
 if [ $# -ne 2 ]; then
-  echo "usage: mindist <destdir> <pkgsubdir>"
+  echo "usage: mindist <destdir> <pkglibdir>"
   exit 1
 fi
 destdir=$1
-pkgsubdir=$2
+pkglibdir=$2
 
 dst=$destdir/$prefix
 
@@ -28,49 +28,54 @@ rm -f $dst/bin/valgrind-di-server
 rm -f $dst/bin/valgrind-listener
 rm -f $dst/bin/vgdb
 if [ -f $dst/bin/valgrind ]; then
-  mv $dst/bin/valgrind $destdir/$pkgsubdir/vg
+  mv $dst/bin/valgrind $destdir/$pkglibdir/valgrind
 fi
 #
 if [ -f $dst/include/valgrind/libvex_ir.h ]; then
-  cp $dst/include/valgrind/libvex_ir.h $destdir/$pkgsubdir
+  cp $dst/include/valgrind/libvex_ir.h $destdir/$pkglibdir/
 fi
 if [ -f $dst/include/valgrind/cputil.h ]; then
-   mv $dst/include/valgrind/cputil.h $dst
+   mv $dst/include/valgrind/cputil.h $dst/
 fi
 rm -rf $dst/include
 mkdir -p $dst/include
 if [ -f $dst/cputil.h ]; then
   mv $dst/cputil.h $dst/include/
 fi
-rm -rf $dst/share
-rm -rf $dst/lib/pkgconfig
+rm -rf $destdir/$prefix/share
+rm -rf $destdir/$prefix/lib/pkgconfig
 #
-rm -rf $destdir/$pkgsubdir/vgpreload_memcheck*
-rm -rf $destdir/$pkgsubdir/vgpreload_massif*
-rm -rf $destdir/$pkgsubdir/vgpreload_exp*
-rm -rf $destdir/$pkgsubdir/vgpreload_drd*
-rm -rf $destdir/$pkgsubdir/vgpreload_helgrind*
+rm -rf $destdir/$pkglibdir/vgpreload_memcheck*
+rm -rf $destdir/$pkglibdir/vgpreload_massif*
+rm -rf $destdir/$pkglibdir/vgpreload_exp*
+rm -rf $destdir/$pkglibdir/vgpreload_drd*
+rm -rf $destdir/$pkglibdir/vgpreload_helgrind*
 #
-rm -f $destdir/$pkgsubdir/s390*
-rm -f $destdir/$pkgsubdir/power*
-rm -f $destdir/$pkgsubdir/mips*
-rm -f $destdir/$pkgsubdir/arm*
+rm  -f $destdir/$pkglibdir/s390*
+rm  -f $destdir/$pkglibdir/power*
+rm  -f $destdir/$pkglibdir/mips*
+rm  -f $destdir/$pkglibdir/arm*
 #
-rm -rf destdirdst/$pkgsubdir/none*
-rm -rf $destdir/$pkgsubdir/memcheck*
-rm -rf $destdir/$pkgsubdir/massif*
-rm -rf $destdir/$pkgsubdir/getoff*
-rm -rf $destdir/$pkgsubdir/helgrind*
-rm -rf $destdir/$pkgsubdir/lackey*
-rm -rf $destdir/$pkgsubdir/exp*
-rm -rf $destdir/$pkgsubdir/drd*
-rm -rf $destdir/$pkgsubdir/cachegrind*
-rm -rf $destdir/$pkgsubdir/callgrind*
+rm -rf $destdir/$pkglibdir/none*
+rm -rf $destdir/$pkglibdir/memcheck*
+rm -rf $destdir/$pkglibdir/massif*
+rm -rf $destdir/$pkglibdir/getoff*
+rm -rf $destdir/$pkglibdir/helgrind*
+rm -rf $destdir/$pkglibdir/lackey*
+rm -rf $destdir/$pkglibdir/exp*
+rm -rf $destdir/$pkglibdir/drd*
+rm -rf $destdir/$pkglibdir/cachegrind*
+rm -rf $destdir/$pkglibdir/callgrind*
 #
-rm -f $destdir/$pkgsubdir/*.xml
-rm -f $destdir/$pkgsubdir/*.a
-rm -f $destdir/$pkgsubdir/default.supp
+rm  -f $destdir/$pkglibdir/*.xml
+rm  -f $destdir/$pkglibdir/*.a
+rm  -f $destdir/$pkglibdir/default.supp
 #
-#strip $destdir/$pkgsubdir/cputil-*
+
+echo "#!/bin/sh" >$dst/bin/cputil
+echo "#VALGRIND_LIB=$pkglibdir" >>$dst/bin/cputil
+echo "#export VALGRIND_LIB" >>$dst/bin/cputil
+echo "$pkglibdir/valgrind -q" '--tool=cputil "$$@"' >>$dst/bin/cputil
+chmod +x $dst/bin/cputil
 
 # --- last line of mindist ---
