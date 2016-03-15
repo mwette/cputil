@@ -746,7 +746,7 @@ static Bool cu_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
          break;
 
       case VG_USERREQ__CU_GETDIV:
-         *ret = cu_divisor = 0;
+         *ret = cu_divisor;
          break;
 
       default:
@@ -893,7 +893,11 @@ static Bool cu_load_op_table(const HChar *filename)
    /* Read parameters. */
    cu_divisor = -1;
    while (1) {
-      if (buf[0] == '#') continue;	/* Allow #-comments. */
+      if (buf[0] == '#') {		/* Allow #-comments. */
+	 res = cu_readline(fd, buf, 80); ln++;
+	 if (res < 0) return False;
+	 continue;
+      }
       sval[39] = 0;
       res = cu_parse_line(buf, &cval, sval, 40);
       if (res < 0) {
@@ -915,7 +919,11 @@ static Bool cu_load_op_table(const HChar *filename)
    /* Read load types. */
    ix = 1;
    while (ix < NUM_LD) {
-      if (buf[0] == '#') continue;	/* Allow #-comments. */
+      if (buf[0] == '#') {		/* Allow #-comments. */
+	 res = cu_readline(fd, buf, 80); ln++;
+	 if (res < 0) return False;
+	 continue;
+      }
       sval[39] = 0;
       res = cu_parse_line(buf, &cval, sval, 40);
       if (res < 0) {
@@ -939,7 +947,11 @@ static Bool cu_load_op_table(const HChar *filename)
    }
    ix = 1;
    while (ix < NUM_OP) {
-      if (buf[0] == '#') continue;	/* Allow #-comments. */
+      if (buf[0] == '#') {		/* Allow #-comments. */
+	 res = cu_readline(fd, buf, 80); ln++;
+	 if (res < 0) return False;
+	 continue;
+      }
       sval[39] = 0;
       res = cu_parse_line(buf, &cval, sval, 40);
       if (res < 0) {

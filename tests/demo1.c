@@ -11,7 +11,7 @@ foo(double x, double y)
   return sqrt((3.0 + x)/(9.4 + y));
 }
 
-volatile unsigned long curr, prev;
+unsigned long curr, prev, div;
 
 int
 main()
@@ -28,8 +28,9 @@ main()
     CU_CLRCTR();
     z = foo(1.2, 3.6);
     curr = CU_GETCTR();
-    printf("count: %lu\t", curr + prev);
-    printf("delta: %lu\n", curr);
+    div = CU_GETDIV();
+    printf("count: %lu/%lu\t", curr + prev, div);
+    printf("delta: %lu/%lu\n", curr, div);
     prev = prev + curr;
   }
 
