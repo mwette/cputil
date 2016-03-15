@@ -18,8 +18,6 @@ bin_SCRIPTS = cputil
 
 cputil:
 	echo "#!/bin/sh" >cputil
-	echo "#VALGRIND_LIB=$(prefix)/lib/valgrind" >>cputil
-	echo "#export VALGRIND_LIB" >>cputil
 	echo "$(bindir)/valgrind -q" '--tool=cputil "$$@"' >>cputil
 	chmod +x cputil
 
