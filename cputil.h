@@ -21,12 +21,14 @@
  * Example:
  *       unsigned long foo_cnt;
  *       unsigned long foo_div;
- *       CPUTIL_REG_THR();
+ *
+ *       CPUTIL_REG_THR();                 - in task initialization
  *       
- *       foo_cnt = CPUTIL_GET_CTR();
+ *       CPUTIL_CLR_CTR();                 - before each call
  *       foo();
- *       foo_cnt = CPUTIL_GET_CTR();
- *       foo_div = CPUTIL_GET_DIV();
+ *       foo_cnt = CPUTIL_GET_CTR();       - after each call
+ *
+ *       foo_div = CPUTIL_GET_DIV();       - to print results
  *       printf("counts=%u/%d\n", foo_cnt, foo_div);
  *
  * If any counter grows above ULONG_MAX>>1 cputil stops counting and generates
