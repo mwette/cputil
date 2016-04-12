@@ -20,7 +20,7 @@
 
    The GNU General Public License is contained in the file COPYING.
  */
-#include <limits.h>			/* need LONG_MAX */
+#include <limits.h>			/* need ULONG_MAX */
 #include "pub_tool_basics.h"
 #include "pub_tool_vki.h"
 #include "pub_tool_tooliface.h"
@@ -40,7 +40,7 @@ static const HChar cu_version[] = "v160411a";
 /*--- Instrumentation                                      ---*/
 /*------------------------------------------------------------*/
 
-/* TODO: explaint the count tables
+/* TODO: Explain the count tables.
  * The counts can be with refernece to a divisor to get more resolution.
  * For example if, on average, an operation is 1.5 clocks, then the table
  * could use a divisor of 10 and define the operation count to be 15.
