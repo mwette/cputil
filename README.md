@@ -31,38 +31,41 @@ To install:
    $ ./patch1
    ```
 
-4. In the valgrind top direcotry run configure, make and install
+4a. In the valgrind top directory run configure, make and install:
+   ```
+   $ ./configure --prefix=/usr/local
+   $ make 
+   $ make install
+   ```
+
+4b. Optionally, if you want a minimal distribution, do this:
    ```
    $ ./configure --prefix=/usr/local
    $ mkdir -p /var/tmp/bindist
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
-   ```
-
-5. If you want a minimum distribution do this:
-   ```
    $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
    ```
 
 ## Notes
 
 This valgrind tool provides approximate cycle counts for user-defined
-regions of code.
+regions of code.  It works on a per-thread basis.
 
 ### dumping the op-count tables
-There is no way to dump the op-tables w/o specifing a program to run the
-tool on.  That is, "valgrind --tool=cputil --dump-op_tables=abc won't work.
-You need to do "valgrind --tool=cputil --dump-op_tables=abc /bin/echo".
+To dump the internal tables execute
+   ```
+   $ valgrind --tool=cputil --dump-op-tables=dump.cut true
+   ```
+There is no way to dump the op-tables w/o specifing a program to so
+we use use /bin/true.
 
-* debug options: valgrind --help-debug
-* idea: for timings unknown, set to 0 and print notice after
 
-### Printing out blocks
-
-Try running with "--vex-guest-chase-thresh=0 --trace-flags=10000000
---trace-notbelow=999999".  This should print one line for each block
-translated, and that includes the address.  Re-run w/ 999999 changed 
-to highest bb number shown.
+### loading user-defined op-count tables
+A dumped op table can be edited for clock counts and used for another run:
+   ```
+   $ valgrind --tool=cputil --load-op-tables=dump.cut my_program
+   ```
 
 ### Threads
 
