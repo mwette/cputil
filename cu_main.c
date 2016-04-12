@@ -34,7 +34,7 @@
 #include "pub_tool_threadstate.h"
 #include "cputildefs.h"
 
-static const HChar cu_version[] = "v160312b";
+static const HChar cu_version[] = "v160411a";
 
 /*------------------------------------------------------------*/
 /*--- Instrumentation                                      ---*/
