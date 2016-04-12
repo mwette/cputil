@@ -73,10 +73,9 @@ rm  -f $destdir/$pkglibdir/default.supp
 #
 
 echo "#!/bin/sh" >$dst/bin/cputil
-echo "pkglibdir=$pkglibdir" >>$dst/bin/cputil
-echo "#VALGRIND_LIB=\$pkglibdir" >>$dst/bin/cputil
+echo "VALGRIND_LIB=$pkglibdir" >>$dst/bin/cputil
 echo "#export VALGRIND_LIB" >>$dst/bin/cputil
-echo "\$pkglibdir/valgrind -q" '--tool=cputil "$@"' >>$dst/bin/cputil
+echo "\$VALGRIND_LIB/valgrind -q" '--tool=cputil "$@"' >>$dst/bin/cputil
 chmod +x $dst/bin/cputil
 
 # --- last line of mindist ---
