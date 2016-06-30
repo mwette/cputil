@@ -52,6 +52,8 @@ To install:
 This valgrind tool provides approximate cycle counts for user-defined
 regions of code.  It works on a per-thread basis.
 
+The cache1 branch is adding code to model latency wrt cache.
+
 ### dumping the op-count tables
 To dump the internal tables execute
    ```
