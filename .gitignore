@@ -1,3 +1,4 @@
+# cputil/.gitignore
 *~
 Makefile
 *.o
