@@ -32,6 +32,8 @@ typedef
       VG_USERREQ__CU_CLRCTR,
       VG_USERREQ__CU_GETCTR,
       VG_USERREQ__CU_GETDIV,
+      VG_USERREQ__CU_CINVAL,
+      VG_USERREQ__CU_CFLUSH,
       VG_USERREQ__END_OF_CPUTIL = VG_USERREQ_TOOL_BASE('C','U') + 256
    } Vg_CputilClientRequest;
 
@@ -40,6 +42,8 @@ typedef
  * void CU_CLRCTR(void);
  * unsigned long CU_GETCTR();
  * unsigned long CU_GETDIV();
+ * void CU_CINVAL(unsigned long id);
+ * void CU_CFLUSH(unsigned long id);
  */
 
 #define CU_REGTHR()                     \
@@ -53,6 +57,12 @@ typedef
 
 #define CU_GETDIV()                     \
    VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_GETDIV, 0,0,0,0,0)
+
+#define CU_CINVAL(id)                   \
+  VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_CINVAL, (id),0,0,0,0)
+
+#define CU_CFLUSH(id)                   \
+  VALGRIND_DO_CLIENT_REQUEST_EXPR(0, VG_USERREQ__CU_CFLUSH, (id),0,0,0,0)
 
 #endif
 /* --- last line --- */

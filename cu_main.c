@@ -530,6 +530,79 @@ static void update_clkcnt(UInt lclkcnt)
 }
 
 #if 0
+/* cache ops
+ *
+ * For now, just simulate one insn and one data cache.  That is, no multi-
+ * level cache details.
+ *
+ * During execution we need to use dirty-calls to update the dclkcnt and
+ * iclkcnt.  On entry to each superblock iclkcnt and dclkcnt are zeroed.
+ * On exit from each superblock iclkcnt and dclkcnt are added to the lclkcnt.
+ * 
+ * Faster way, similar to method used by cachegrind, is, for each superblock, 
+ * to track memory events and process them on the superblock exit.  We could
+ * assume some maximum number of events per superblock.
+ *
+ * Instead of making a data structure we assume that the low order bits are 
+ * zero for the line address.
+ *
+ * mem ops: insn-ld, data-ld, data-st
+ *
+ * ppc750: i and d are 8-way set associative, 32 byte line size, loaded in
+ * four 8-byte transfers
+ */
+
+static Int track_icache_ops = 0;
+static Int track_dcache_ops = 0;
+
+static UInt linesize_exp = 6;	        /* line is 2^n bytes */
+static UInt lines_per_set = 4;		/* 4 for 4-way set ass'tive */
+static UInt num_sets = 0x1000;		/* unique addr range? */
+static ULong set_mask = 0;		/* mask to index set */
+static UInt line_addr_shift = 2;        /* shift for line */
+static UInt line_size = 4;		/* line size (bytes) */
+
+/* updated by dirty calls: */
+static Int dclkcnt;			/* data-cache clock count */
+static Int iclkcnt;			/* insn-cache clock count */
+
+#define VALID_MASK 0x01 /* mark on load/read */
+#define DIRTY_MASK 0x02 /* mark on store */
+
+static Addr **icache;
+static Int icsize = 0;
+static Addr **dcache;
+static Int dcsize = 0;
+
+static Void cache_invalid()
+{
+   VG_(memset)(icache, 0, icsize);
+   VG_(memset)(dcache, 0, dcsize);
+}
+
+static Void cache_flush()
+{
+   UWord cnt;
+   
+   /* compute cnt for what needs to be flushed */
+   
+   //find_thread()
+   // update thread cnt
+}
+
+static Int dcache_access(InstrInfo* n)
+{
+   return 0;
+}
+
+static Int dcache_access(InstrInfo* n)
+{
+   return 0;
+}
+
+#endif
+
+#if 0
 /* for debug/development, so we can see counts via --trace-flags */
 static void mark_count(UInt clkcntinc) { }
 #define MARK_COUNT(C)			do {	 \
@@ -544,6 +617,11 @@ static void mark_count(UInt clkcntinc) { }
 
 /* We will count expressions and statements.  We assume that, since the code
  * is flattened, no statement will have more than one expression.
+ *
+ * cache: 
+ * For the data cache, just track loads and stores.
+ * For the instruction cache, we could do superblock-wise or instruction-wise.
+ * It is probably easier to do instruction-wise but code faster superblock-wise.
  */
 static
 IRSB* cu_instrument ( VgCallbackClosure* closure,
@@ -582,12 +660,16 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
     * remove the small number of clock cycles to implement clientrequest.
     */
    lclkcnt = cu_divisor;	/* Count the clocks to branch here. */
+#if 0
+   iclkcnt = 0;			/* zero clocks for insn-cache misses */
+   dclkcnt = 0;			/* zero clocks for data-cache misses */
+#endif
    for (/*use current i*/; i < sbIn->stmts_used; i++) {
       IRStmt* st = sbIn->stmts[i];
       if (!st || st->tag == Ist_NoOp) continue;
 
       switch (st->tag) {
-         case Ist_NoOp:			/* no op */
+         case Ist_NoOp:			/* no op: not used, see above */
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_IMark:		/* guest instruction marker */
@@ -622,6 +704,13 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             break;
          case Ist_Store:		/* store to memory */
 	    sclkcnt = 0;
+#if 0
+	    if (track_dcache_ops) {
+	       /* TODO: instrument for cache */
+	       // add dirty call to update dclkcnt
+	       //dcache_access(InstrInfo* n);
+	    }
+#endif
 	    expr  = st->Ist.Store.data;
 	    sclkcnt += cu_expr_cnt(expr);
 	    sclkcnt += cu_divisor;    /* Add 1 clock for the store. */
@@ -630,6 +719,11 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
 	 case Ist_LoadG:		/* guarded load */
+#if 0
+	    if (track_cache_ops) {
+	       /* TODO: instrument for cache ?? */
+	    }
+#endif
 	    sclkcnt = 0;
 	    expr = st->Ist.LoadG.details->addr;
 	    sclkcnt += cu_expr_cnt(expr);
@@ -642,6 +736,11 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
 	    break;
 	 case Ist_StoreG:		/* guarded store */
+#if 0
+	    if (track_cache_ops) {
+	       /* TODO: instrument for cache ?? */
+	    }
+#endif
 	    sclkcnt = 0;
 	    expr  = st->Ist.StoreG.details->addr;
 	    sclkcnt += cu_expr_cnt(expr);
@@ -661,6 +760,11 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_LLSC:			/* load from memory */
+#if 0
+	    if (track_cache_ops) {
+	       /* TODO: instrument for cache */
+	    }
+#endif
 	    sclkcnt = 0;
 	    expr = st->Ist.LLSC.storedata;
 	    sclkcnt += cu_expr_cnt(expr);
@@ -681,6 +785,11 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
             addStmtToIRSB( sbOut, st );
             break;
          case Ist_MBE:			/* memory bus event */
+#if 0
+	    if (track_cache_ops) {
+	       /* TODO: instrument for cache ?? */
+	    }
+#endif
 	    /* Just assume one clock for now */
 	    sclkcnt = cu_divisor;
 	    MARK_COUNT(sclkdnt);
@@ -691,6 +800,9 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
 	    /* This is the hook to add counts to user's counter. */
             /* \todo: Add counts for branching. ??? */
 	    sclkcnt = 0;
+#if 0
+	    lclkcnt += iclkcnt + dclkcnt; /* add cache-miss clocks */
+#endif
 	    expr = IRExpr_Const(IRConst_U64(lclkcnt));
 	    di = unsafeIRDirty_0_N( 0, "update_clkcnt", 
 				    VG_(fnptr_to_fnentry)( &update_clkcnt ),
@@ -724,12 +836,15 @@ IRSB* cu_instrument ( VgCallbackClosure* closure,
 
 static Bool cu_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
 {
+   UWord id;
+   
    //VG_(printf)("cu_handle_client_request called\n");
    if (!VG_IS_TOOL_USERREQ('C','U',arg[0])
        && VG_USERREQ__CU_REGTHR != arg[0]
        && VG_USERREQ__CU_CLRCTR != arg[0]
        && VG_USERREQ__CU_GETCTR != arg[0]
-       && VG_USERREQ__CU_GETDIV != arg[0])
+       && VG_USERREQ__CU_GETDIV != arg[0]
+       && VG_USERREQ__CU_CINVAL != arg[0])
       return False;
 
    switch (arg[0]) {
@@ -747,6 +862,14 @@ static Bool cu_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
 
       case VG_USERREQ__CU_GETDIV:
          *ret = cu_divisor;
+         break;
+
+      case VG_USERREQ__CU_CINVAL:	/* invalidate the cache */
+	 id = arg[1];
+         break;
+
+      case VG_USERREQ__CU_CFLUSH:	/* flush the (dirty) cache (lines) */
+	 id = arg[1];
          break;
 
       default:
@@ -977,12 +1100,18 @@ static Bool cu_load_op_table(const HChar *filename)
    return True;
 }
 
+static Bool cu_include_cache_ops()
+{
+   return True;
+}
+
 static void cu_print_usage(void)
 {  
    VG_(printf)(
       "    --help                    help me\n"
       "    --dump-op-table=file      print op-count table to <file>\n"
       "    --load-op-table=file      load op-count table from <file>\n"
+      "    --include_cache_ops       include timing for cache op's\n"
    );
 }
 
@@ -1002,6 +1131,9 @@ static Bool cu_process_cmd_line_option(const HChar* arg)
    }
    else if VG_STR_CLO(arg, "--load-op-table", xarg) {
          return cu_load_op_table(xarg);
+   }
+   else if VG_STR_CLO(arg, "--include-cache-ops", xarg) {
+         return cu_include_cache_ops();
    }
    else
       return False;
