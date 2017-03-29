@@ -13,6 +13,30 @@ modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the
 License, or (at your option) any later version.
 
+## Introduction
+
+This valgrind tool provides approximate cycle counts for user-defined
+regions of code.  It works on a per-thread basis.  The following program,
+when executed under cputil/valgrind will report the estimated number of 
+clock cycles required to execute foo().  The default processor model is
+a PowerPC750, but can be changed with a user-loadable table.
+
+```
+#include <stdio.h>
+#include "cputil.h"
+int main() {
+  long cycles;
+  CU_REGTHR();                /* register the current thread */
+  for (i = 0; i < 5; i++) {
+    CU_CLRCTR();              /* clear the cycle counter */
+    foo(i);
+    cycles += CU_GETCTR();    /* read the cycle counter */
+    bar(i);
+  }
+  printf("clk-cycles=%d\n", cycles)
+}
+```
+
 ## Installation
 
 This works with valgrind-3.11.0.  Goal will be to work w/ >3.0.
@@ -46,11 +70,6 @@ To install:
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
    $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
    ```
-
-## Notes
-
-This valgrind tool provides approximate cycle counts for user-defined
-regions of code.  It works on a per-thread basis.
 
 ### dumping the op-count tables
 To dump the internal tables execute
