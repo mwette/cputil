@@ -1,5 +1,5 @@
 # default valgrind/cputil count table
-# for valgrind-3.11.0
+# for valgrind-3.13.0
 #
 # ppc750 rough estimate
 #
@@ -218,6 +218,10 @@
 4	Iop_SubF128
 8	Iop_MulF128
 64	Iop_DivF128
+99	Iop_MAddF128
+99	Iop_MSubF128
+99	Iop_NegMAddF128
+99	Iop_NegMSubF128
 4	Iop_NegF128
 4	Iop_AbsF128
 2	Iop_SqrtF128
@@ -231,8 +235,14 @@
 1	Iop_F128toI64S
 1	Iop_F128toI32U
 1	Iop_F128toI64U
+99	Iop_F128toI128S
 1	Iop_F128toF64
 1	Iop_F128toF32
+99	Iop_RndF128
+99	Iop_TruncF128toI32S
+99	Iop_TruncF128toI32U
+99	Iop_TruncF128toI64U
+99	Iop_TruncF128toI64S
 99	Iop_AtanF64
 99	Iop_Yl2xF64
 99	Iop_Yl2xp1F64
@@ -263,6 +273,10 @@
 2	Iop_RoundF64toF32
 5	Iop_RecpExpF64
 5	Iop_RecpExpF32
+99	Iop_MaxNumF64
+99	Iop_MinNumF64
+99	Iop_MaxNumF32
+99	Iop_MinNumF32
 1	Iop_F16toF64
 1	Iop_F64toF16
 1	Iop_F16toF32
@@ -404,6 +418,10 @@
 0	Iop_Cls16x4
 0	Iop_Cls32x2
 1	Iop_Clz64x2
+99	Iop_Ctz8x16
+99	Iop_Ctz16x8
+99	Iop_Ctz32x4
+99	Iop_Ctz64x2
 1	Iop_Shl8x8
 1	Iop_Shl16x4
 1	Iop_Shl32x2
@@ -558,6 +576,8 @@
 1	Iop_BCDtoDPB
 1	Iop_BCDAdd
 1	Iop_BCDSub
+99	Iop_I128StoBCD128
+99	Iop_BCD128toI128S
 1	Iop_ReinterpI64asD64
 1	Iop_ReinterpD64asI64
 1	Iop_Add32Fx4
@@ -599,6 +619,8 @@
 1	Iop_Fixed32SToF32x4_RN
 1	Iop_F32toF16x4
 1	Iop_F16toF32x4
+99	Iop_F64toF16x2
+99	Iop_F16toF64x2
 1	Iop_Add32F0x4
 1	Iop_Sub32F0x4
 2	Iop_Mul32F0x4
@@ -952,6 +974,10 @@
 1	Iop_GetMSBs8x16
 1	Iop_RecipEst32Ux4
 1	Iop_RSqrtEst32Ux4
+99	Iop_MulI128by10
+99	Iop_MulI128by10Carry
+99	Iop_MulI128by10E
+99	Iop_MulI128by10ECarry
 1	Iop_V256to64_0
 1	Iop_V256to64_1
 1	Iop_V256to64_2

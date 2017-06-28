@@ -215,6 +215,10 @@
 0	Iop_SubF128
 0	Iop_MulF128
 0	Iop_DivF128
+0	Iop_MAddF128
+0	Iop_MSubF128
+0	Iop_NegMAddF128
+0	Iop_NegMSubF128
 0	Iop_NegF128
 0	Iop_AbsF128
 0	Iop_SqrtF128
@@ -228,8 +232,14 @@
 0	Iop_F128toI64S
 0	Iop_F128toI32U
 0	Iop_F128toI64U
+0	Iop_F128toI128S
 0	Iop_F128toF64
 0	Iop_F128toF32
+0	Iop_RndF128
+0	Iop_TruncF128toI32S
+0	Iop_TruncF128toI32U
+0	Iop_TruncF128toI64U
+0	Iop_TruncF128toI64S
 0	Iop_AtanF64
 0	Iop_Yl2xF64
 0	Iop_Yl2xp1F64
@@ -260,6 +270,10 @@
 0	Iop_RoundF64toF32
 0	Iop_RecpExpF64
 0	Iop_RecpExpF32
+0	Iop_MaxNumF64
+0	Iop_MinNumF64
+0	Iop_MaxNumF32
+0	Iop_MinNumF32
 0	Iop_F16toF64
 0	Iop_F64toF16
 0	Iop_F16toF32
@@ -401,6 +415,10 @@
 0	Iop_Cls16x4
 0	Iop_Cls32x2
 0	Iop_Clz64x2
+0	Iop_Ctz8x16
+0	Iop_Ctz16x8
+0	Iop_Ctz32x4
+0	Iop_Ctz64x2
 0	Iop_Shl8x8
 0	Iop_Shl16x4
 0	Iop_Shl32x2
@@ -555,6 +573,8 @@
 0	Iop_BCDtoDPB
 0	Iop_BCDAdd
 0	Iop_BCDSub
+0	Iop_I128StoBCD128
+0	Iop_BCD128toI128S
 0	Iop_ReinterpI64asD64
 0	Iop_ReinterpD64asI64
 0	Iop_Add32Fx4
@@ -596,6 +616,8 @@
 0	Iop_Fixed32SToF32x4_RN
 0	Iop_F32toF16x4
 0	Iop_F16toF32x4
+0	Iop_F64toF16x2
+0	Iop_F16toF64x2
 0	Iop_Add32F0x4
 0	Iop_Sub32F0x4
 0	Iop_Mul32F0x4
@@ -949,6 +971,10 @@
 0	Iop_GetMSBs8x16
 0	Iop_RecipEst32Ux4
 0	Iop_RSqrtEst32Ux4
+0	Iop_MulI128by10
+0	Iop_MulI128by10Carry
+0	Iop_MulI128by10E
+0	Iop_MulI128by10ECarry
 0	Iop_V256to64_0
 0	Iop_V256to64_1
 0	Iop_V256to64_2

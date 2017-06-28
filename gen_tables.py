@@ -2,8 +2,12 @@
 #
 # gen_tables.py - generate blank table or load (default) table into cu_main.c
 #
-# Copyright (C) 2013,2016 Matthew R. Wette
-# mwette@alumni.caltech.edu
+# Copyright (C) 2013,2016-2017 Matthew R. Wette
+#
+# usage for new ../VEX/pub/libvex_ir.h (new release)
+#   $ ./gen_tables.py -d
+# usage for working cuts/default.cut table
+#   $ ./gen_tables.py
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,13 +20,11 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# 02111-1307, USA.
+# along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # The GNU General Public License is contained in the file COPYING.
 #
-# v130311a
+# v170626a - mwette@alumni.caltech.edu
 
 import sys, os, re
 from string import join, whitespace

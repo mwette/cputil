@@ -1,7 +1,6 @@
 /* cu_main.c - execution profiler under valgrind
 
-   Copyright (C) 2013,2015,2016 Matthew R. Wette
-   mwette@alumni.caltech.edu
+   Copyright (C) 2013,2015-2017 Matthew R. Wette
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -14,11 +13,11 @@
    General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see http://www.gnu.org/licenses,
-   or write to the Free Software Foundation, Inc., 59 Temple Place, 
-   Suite 330, Boston, MA 02111-1307, USA.
+   along with this program; if not, see http://www.gnu.org/licenses.
 
    The GNU General Public License is contained in the file COPYING.
+
+   mwette@alumni.caltech.edu
  */
 #include <limits.h>			/* need LONG_MAX */
 #include "pub_tool_basics.h"
@@ -34,7 +33,7 @@
 #include "pub_tool_threadstate.h"
 #include "cputildefs.h"
 
-static const HChar cu_version[] = "v160411a";
+static const HChar cu_version[] = "v170626a";
 
 /*------------------------------------------------------------*/
 /*--- Instrumentation                                      ---*/
@@ -46,7 +45,7 @@ static const HChar cu_version[] = "v160411a";
  * could use a divisor of 10 and define the operation count to be 15.
  */
 /* count_tables: beg */
-#define NUM_OP 1022
+#define NUM_OP 1048
 static const HChar *cu_op_names[] = {
    "Iop_INVALID", "Iop_Add8", "Iop_Add16", "Iop_Add32", "Iop_Add64",
    "Iop_Sub8", "Iop_Sub16", "Iop_Sub32", "Iop_Sub64", "Iop_Mul8",
@@ -91,64 +90,68 @@ static const HChar *cu_op_names[] = {
    "Iop_I64StoF32", "Iop_F32toF64", "Iop_F64toF32", "Iop_ReinterpF64asI64",
    "Iop_ReinterpI64asF64", "Iop_ReinterpF32asI32", "Iop_ReinterpI32asF32",
    "Iop_F64HLtoF128", "Iop_F128HItoF64", "Iop_F128LOtoF64", "Iop_AddF128",
-   "Iop_SubF128", "Iop_MulF128", "Iop_DivF128", "Iop_NegF128",
+   "Iop_SubF128", "Iop_MulF128", "Iop_DivF128", "Iop_MAddF128",
+   "Iop_MSubF128", "Iop_NegMAddF128", "Iop_NegMSubF128", "Iop_NegF128",
    "Iop_AbsF128", "Iop_SqrtF128", "Iop_I32StoF128", "Iop_I64StoF128",
    "Iop_I32UtoF128", "Iop_I64UtoF128", "Iop_F32toF128", "Iop_F64toF128",
    "Iop_F128toI32S", "Iop_F128toI64S", "Iop_F128toI32U", "Iop_F128toI64U",
-   "Iop_F128toF64", "Iop_F128toF32", "Iop_AtanF64", "Iop_Yl2xF64",
-   "Iop_Yl2xp1F64", "Iop_PRemF64", "Iop_PRemC3210F64", "Iop_PRem1F64",
-   "Iop_PRem1C3210F64", "Iop_ScaleF64", "Iop_SinF64", "Iop_CosF64",
-   "Iop_TanF64", "Iop_2xm1F64", "Iop_RoundF128toInt", "Iop_RoundF64toInt",
-   "Iop_RoundF32toInt", "Iop_MAddF32", "Iop_MSubF32", "Iop_MAddF64",
-   "Iop_MSubF64", "Iop_MAddF64r32", "Iop_MSubF64r32",
-   "Iop_RSqrtEst5GoodF64", "Iop_RoundF64toF64_NEAREST",
-   "Iop_RoundF64toF64_NegINF", "Iop_RoundF64toF64_PosINF",
-   "Iop_RoundF64toF64_ZERO", "Iop_TruncF64asF32", "Iop_RoundF64toF32",
-   "Iop_RecpExpF64", "Iop_RecpExpF32", "Iop_F16toF64", "Iop_F64toF16",
-   "Iop_F16toF32", "Iop_F32toF16", "Iop_QAdd32S", "Iop_QSub32S",
-   "Iop_Add16x2", "Iop_Sub16x2", "Iop_QAdd16Sx2", "Iop_QAdd16Ux2",
-   "Iop_QSub16Sx2", "Iop_QSub16Ux2", "Iop_HAdd16Ux2", "Iop_HAdd16Sx2",
-   "Iop_HSub16Ux2", "Iop_HSub16Sx2", "Iop_Add8x4", "Iop_Sub8x4",
-   "Iop_QAdd8Sx4", "Iop_QAdd8Ux4", "Iop_QSub8Sx4", "Iop_QSub8Ux4",
-   "Iop_HAdd8Ux4", "Iop_HAdd8Sx4", "Iop_HSub8Ux4", "Iop_HSub8Sx4",
-   "Iop_Sad8Ux4", "Iop_CmpNEZ16x2", "Iop_CmpNEZ8x4", "Iop_I32UtoFx2",
-   "Iop_I32StoFx2", "Iop_FtoI32Ux2_RZ", "Iop_FtoI32Sx2_RZ",
-   "Iop_F32ToFixed32Ux2_RZ", "Iop_F32ToFixed32Sx2_RZ",
-   "Iop_Fixed32UToF32x2_RN", "Iop_Fixed32SToF32x2_RN", "Iop_Max32Fx2",
-   "Iop_Min32Fx2", "Iop_PwMax32Fx2", "Iop_PwMin32Fx2", "Iop_CmpEQ32Fx2",
-   "Iop_CmpGT32Fx2", "Iop_CmpGE32Fx2", "Iop_RecipEst32Fx2",
-   "Iop_RecipStep32Fx2", "Iop_RSqrtEst32Fx2", "Iop_RSqrtStep32Fx2",
-   "Iop_Neg32Fx2", "Iop_Abs32Fx2", "Iop_CmpNEZ8x8", "Iop_CmpNEZ16x4",
-   "Iop_CmpNEZ32x2", "Iop_Add8x8", "Iop_Add16x4", "Iop_Add32x2",
-   "Iop_QAdd8Ux8", "Iop_QAdd16Ux4", "Iop_QAdd32Ux2", "Iop_QAdd64Ux1",
-   "Iop_QAdd8Sx8", "Iop_QAdd16Sx4", "Iop_QAdd32Sx2", "Iop_QAdd64Sx1",
-   "Iop_PwAdd8x8", "Iop_PwAdd16x4", "Iop_PwAdd32x2", "Iop_PwMax8Sx8",
-   "Iop_PwMax16Sx4", "Iop_PwMax32Sx2", "Iop_PwMax8Ux8", "Iop_PwMax16Ux4",
-   "Iop_PwMax32Ux2", "Iop_PwMin8Sx8", "Iop_PwMin16Sx4", "Iop_PwMin32Sx2",
-   "Iop_PwMin8Ux8", "Iop_PwMin16Ux4", "Iop_PwMin32Ux2", "Iop_PwAddL8Ux8",
-   "Iop_PwAddL16Ux4", "Iop_PwAddL32Ux2", "Iop_PwAddL8Sx8",
-   "Iop_PwAddL16Sx4", "Iop_PwAddL32Sx2", "Iop_Sub8x8", "Iop_Sub16x4",
-   "Iop_Sub32x2", "Iop_QSub8Ux8", "Iop_QSub16Ux4", "Iop_QSub32Ux2",
-   "Iop_QSub64Ux1", "Iop_QSub8Sx8", "Iop_QSub16Sx4", "Iop_QSub32Sx2",
-   "Iop_QSub64Sx1", "Iop_Abs8x8", "Iop_Abs16x4", "Iop_Abs32x2",
-   "Iop_Mul8x8", "Iop_Mul16x4", "Iop_Mul32x2", "Iop_Mul32Fx2",
-   "Iop_MulHi16Ux4", "Iop_MulHi16Sx4", "Iop_PolynomialMul8x8",
-   "Iop_QDMulHi16Sx4", "Iop_QDMulHi32Sx2", "Iop_QRDMulHi16Sx4",
-   "Iop_QRDMulHi32Sx2", "Iop_Avg8Ux8", "Iop_Avg16Ux4", "Iop_Max8Sx8",
-   "Iop_Max16Sx4", "Iop_Max32Sx2", "Iop_Max8Ux8", "Iop_Max16Ux4",
-   "Iop_Max32Ux2", "Iop_Min8Sx8", "Iop_Min16Sx4", "Iop_Min32Sx2",
-   "Iop_Min8Ux8", "Iop_Min16Ux4", "Iop_Min32Ux2", "Iop_CmpEQ8x8",
-   "Iop_CmpEQ16x4", "Iop_CmpEQ32x2", "Iop_CmpGT8Ux8", "Iop_CmpGT16Ux4",
-   "Iop_CmpGT32Ux2", "Iop_CmpGT8Sx8", "Iop_CmpGT16Sx4", "Iop_CmpGT32Sx2",
-   "Iop_Cnt8x8", "Iop_Clz8x8", "Iop_Clz16x4", "Iop_Clz32x2", "Iop_Cls8x8",
-   "Iop_Cls16x4", "Iop_Cls32x2", "Iop_Clz64x2", "Iop_Shl8x8", "Iop_Shl16x4",
-   "Iop_Shl32x2", "Iop_Shr8x8", "Iop_Shr16x4", "Iop_Shr32x2", "Iop_Sar8x8",
-   "Iop_Sar16x4", "Iop_Sar32x2", "Iop_Sal8x8", "Iop_Sal16x4", "Iop_Sal32x2",
-   "Iop_Sal64x1", "Iop_ShlN8x8", "Iop_ShlN16x4", "Iop_ShlN32x2",
-   "Iop_ShrN8x8", "Iop_ShrN16x4", "Iop_ShrN32x2", "Iop_SarN8x8",
-   "Iop_SarN16x4", "Iop_SarN32x2", "Iop_QShl8x8", "Iop_QShl16x4",
-   "Iop_QShl32x2", "Iop_QShl64x1", "Iop_QSal8x8", "Iop_QSal16x4",
-   "Iop_QSal32x2", "Iop_QSal64x1", "Iop_QShlNsatSU8x8",
+   "Iop_F128toI128S", "Iop_F128toF64", "Iop_F128toF32", "Iop_RndF128",
+   "Iop_TruncF128toI32S", "Iop_TruncF128toI32U", "Iop_TruncF128toI64U",
+   "Iop_TruncF128toI64S", "Iop_AtanF64", "Iop_Yl2xF64", "Iop_Yl2xp1F64",
+   "Iop_PRemF64", "Iop_PRemC3210F64", "Iop_PRem1F64", "Iop_PRem1C3210F64",
+   "Iop_ScaleF64", "Iop_SinF64", "Iop_CosF64", "Iop_TanF64", "Iop_2xm1F64",
+   "Iop_RoundF128toInt", "Iop_RoundF64toInt", "Iop_RoundF32toInt",
+   "Iop_MAddF32", "Iop_MSubF32", "Iop_MAddF64", "Iop_MSubF64",
+   "Iop_MAddF64r32", "Iop_MSubF64r32", "Iop_RSqrtEst5GoodF64",
+   "Iop_RoundF64toF64_NEAREST", "Iop_RoundF64toF64_NegINF",
+   "Iop_RoundF64toF64_PosINF", "Iop_RoundF64toF64_ZERO",
+   "Iop_TruncF64asF32", "Iop_RoundF64toF32", "Iop_RecpExpF64",
+   "Iop_RecpExpF32", "Iop_MaxNumF64", "Iop_MinNumF64", "Iop_MaxNumF32",
+   "Iop_MinNumF32", "Iop_F16toF64", "Iop_F64toF16", "Iop_F16toF32",
+   "Iop_F32toF16", "Iop_QAdd32S", "Iop_QSub32S", "Iop_Add16x2",
+   "Iop_Sub16x2", "Iop_QAdd16Sx2", "Iop_QAdd16Ux2", "Iop_QSub16Sx2",
+   "Iop_QSub16Ux2", "Iop_HAdd16Ux2", "Iop_HAdd16Sx2", "Iop_HSub16Ux2",
+   "Iop_HSub16Sx2", "Iop_Add8x4", "Iop_Sub8x4", "Iop_QAdd8Sx4",
+   "Iop_QAdd8Ux4", "Iop_QSub8Sx4", "Iop_QSub8Ux4", "Iop_HAdd8Ux4",
+   "Iop_HAdd8Sx4", "Iop_HSub8Ux4", "Iop_HSub8Sx4", "Iop_Sad8Ux4",
+   "Iop_CmpNEZ16x2", "Iop_CmpNEZ8x4", "Iop_I32UtoFx2", "Iop_I32StoFx2",
+   "Iop_FtoI32Ux2_RZ", "Iop_FtoI32Sx2_RZ", "Iop_F32ToFixed32Ux2_RZ",
+   "Iop_F32ToFixed32Sx2_RZ", "Iop_Fixed32UToF32x2_RN",
+   "Iop_Fixed32SToF32x2_RN", "Iop_Max32Fx2", "Iop_Min32Fx2",
+   "Iop_PwMax32Fx2", "Iop_PwMin32Fx2", "Iop_CmpEQ32Fx2", "Iop_CmpGT32Fx2",
+   "Iop_CmpGE32Fx2", "Iop_RecipEst32Fx2", "Iop_RecipStep32Fx2",
+   "Iop_RSqrtEst32Fx2", "Iop_RSqrtStep32Fx2", "Iop_Neg32Fx2",
+   "Iop_Abs32Fx2", "Iop_CmpNEZ8x8", "Iop_CmpNEZ16x4", "Iop_CmpNEZ32x2",
+   "Iop_Add8x8", "Iop_Add16x4", "Iop_Add32x2", "Iop_QAdd8Ux8",
+   "Iop_QAdd16Ux4", "Iop_QAdd32Ux2", "Iop_QAdd64Ux1", "Iop_QAdd8Sx8",
+   "Iop_QAdd16Sx4", "Iop_QAdd32Sx2", "Iop_QAdd64Sx1", "Iop_PwAdd8x8",
+   "Iop_PwAdd16x4", "Iop_PwAdd32x2", "Iop_PwMax8Sx8", "Iop_PwMax16Sx4",
+   "Iop_PwMax32Sx2", "Iop_PwMax8Ux8", "Iop_PwMax16Ux4", "Iop_PwMax32Ux2",
+   "Iop_PwMin8Sx8", "Iop_PwMin16Sx4", "Iop_PwMin32Sx2", "Iop_PwMin8Ux8",
+   "Iop_PwMin16Ux4", "Iop_PwMin32Ux2", "Iop_PwAddL8Ux8", "Iop_PwAddL16Ux4",
+   "Iop_PwAddL32Ux2", "Iop_PwAddL8Sx8", "Iop_PwAddL16Sx4",
+   "Iop_PwAddL32Sx2", "Iop_Sub8x8", "Iop_Sub16x4", "Iop_Sub32x2",
+   "Iop_QSub8Ux8", "Iop_QSub16Ux4", "Iop_QSub32Ux2", "Iop_QSub64Ux1",
+   "Iop_QSub8Sx8", "Iop_QSub16Sx4", "Iop_QSub32Sx2", "Iop_QSub64Sx1",
+   "Iop_Abs8x8", "Iop_Abs16x4", "Iop_Abs32x2", "Iop_Mul8x8", "Iop_Mul16x4",
+   "Iop_Mul32x2", "Iop_Mul32Fx2", "Iop_MulHi16Ux4", "Iop_MulHi16Sx4",
+   "Iop_PolynomialMul8x8", "Iop_QDMulHi16Sx4", "Iop_QDMulHi32Sx2",
+   "Iop_QRDMulHi16Sx4", "Iop_QRDMulHi32Sx2", "Iop_Avg8Ux8", "Iop_Avg16Ux4",
+   "Iop_Max8Sx8", "Iop_Max16Sx4", "Iop_Max32Sx2", "Iop_Max8Ux8",
+   "Iop_Max16Ux4", "Iop_Max32Ux2", "Iop_Min8Sx8", "Iop_Min16Sx4",
+   "Iop_Min32Sx2", "Iop_Min8Ux8", "Iop_Min16Ux4", "Iop_Min32Ux2",
+   "Iop_CmpEQ8x8", "Iop_CmpEQ16x4", "Iop_CmpEQ32x2", "Iop_CmpGT8Ux8",
+   "Iop_CmpGT16Ux4", "Iop_CmpGT32Ux2", "Iop_CmpGT8Sx8", "Iop_CmpGT16Sx4",
+   "Iop_CmpGT32Sx2", "Iop_Cnt8x8", "Iop_Clz8x8", "Iop_Clz16x4",
+   "Iop_Clz32x2", "Iop_Cls8x8", "Iop_Cls16x4", "Iop_Cls32x2", "Iop_Clz64x2",
+   "Iop_Ctz8x16", "Iop_Ctz16x8", "Iop_Ctz32x4", "Iop_Ctz64x2", "Iop_Shl8x8",
+   "Iop_Shl16x4", "Iop_Shl32x2", "Iop_Shr8x8", "Iop_Shr16x4", "Iop_Shr32x2",
+   "Iop_Sar8x8", "Iop_Sar16x4", "Iop_Sar32x2", "Iop_Sal8x8", "Iop_Sal16x4",
+   "Iop_Sal32x2", "Iop_Sal64x1", "Iop_ShlN8x8", "Iop_ShlN16x4",
+   "Iop_ShlN32x2", "Iop_ShrN8x8", "Iop_ShrN16x4", "Iop_ShrN32x2",
+   "Iop_SarN8x8", "Iop_SarN16x4", "Iop_SarN32x2", "Iop_QShl8x8",
+   "Iop_QShl16x4", "Iop_QShl32x2", "Iop_QShl64x1", "Iop_QSal8x8",
+   "Iop_QSal16x4", "Iop_QSal32x2", "Iop_QSal64x1", "Iop_QShlNsatSU8x8",
    "Iop_QShlNsatSU16x4", "Iop_QShlNsatSU32x2", "Iop_QShlNsatSU64x1",
    "Iop_QShlNsatUU8x8", "Iop_QShlNsatUU16x4", "Iop_QShlNsatUU32x2",
    "Iop_QShlNsatUU64x1", "Iop_QShlNsatSS8x8", "Iop_QShlNsatSS16x4",
@@ -185,26 +188,27 @@ static const HChar *cu_op_names[] = {
    "Iop_ExtractExpD64", "Iop_ExtractExpD128", "Iop_ExtractSigD64",
    "Iop_ExtractSigD128", "Iop_InsertExpD64", "Iop_InsertExpD128",
    "Iop_D64HLtoD128", "Iop_D128HItoD64", "Iop_D128LOtoD64", "Iop_DPBtoBCD",
-   "Iop_BCDtoDPB", "Iop_BCDAdd", "Iop_BCDSub", "Iop_ReinterpI64asD64",
-   "Iop_ReinterpD64asI64", "Iop_Add32Fx4", "Iop_Sub32Fx4", "Iop_Mul32Fx4",
-   "Iop_Div32Fx4", "Iop_Max32Fx4", "Iop_Min32Fx4", "Iop_Add32Fx2",
-   "Iop_Sub32Fx2", "Iop_CmpEQ32Fx4", "Iop_CmpLT32Fx4", "Iop_CmpLE32Fx4",
-   "Iop_CmpUN32Fx4", "Iop_CmpGT32Fx4", "Iop_CmpGE32Fx4", "Iop_PwMax32Fx4",
-   "Iop_PwMin32Fx4", "Iop_Abs32Fx4", "Iop_Neg32Fx4", "Iop_Sqrt32Fx4",
-   "Iop_RecipEst32Fx4", "Iop_RecipStep32Fx4", "Iop_RSqrtEst32Fx4",
-   "Iop_RSqrtStep32Fx4", "Iop_I32UtoFx4", "Iop_I32StoFx4",
-   "Iop_FtoI32Ux4_RZ", "Iop_FtoI32Sx4_RZ", "Iop_QFtoI32Ux4_RZ",
-   "Iop_QFtoI32Sx4_RZ", "Iop_RoundF32x4_RM", "Iop_RoundF32x4_RP",
-   "Iop_RoundF32x4_RN", "Iop_RoundF32x4_RZ", "Iop_F32ToFixed32Ux4_RZ",
-   "Iop_F32ToFixed32Sx4_RZ", "Iop_Fixed32UToF32x4_RN",
-   "Iop_Fixed32SToF32x4_RN", "Iop_F32toF16x4", "Iop_F16toF32x4",
-   "Iop_Add32F0x4", "Iop_Sub32F0x4", "Iop_Mul32F0x4", "Iop_Div32F0x4",
-   "Iop_Max32F0x4", "Iop_Min32F0x4", "Iop_CmpEQ32F0x4", "Iop_CmpLT32F0x4",
-   "Iop_CmpLE32F0x4", "Iop_CmpUN32F0x4", "Iop_RecipEst32F0x4",
-   "Iop_Sqrt32F0x4", "Iop_RSqrtEst32F0x4", "Iop_Add64Fx2", "Iop_Sub64Fx2",
-   "Iop_Mul64Fx2", "Iop_Div64Fx2", "Iop_Max64Fx2", "Iop_Min64Fx2",
-   "Iop_CmpEQ64Fx2", "Iop_CmpLT64Fx2", "Iop_CmpLE64Fx2", "Iop_CmpUN64Fx2",
-   "Iop_Abs64Fx2", "Iop_Neg64Fx2", "Iop_Sqrt64Fx2", "Iop_RecipEst64Fx2",
+   "Iop_BCDtoDPB", "Iop_BCDAdd", "Iop_BCDSub", "Iop_I128StoBCD128",
+   "Iop_BCD128toI128S", "Iop_ReinterpI64asD64", "Iop_ReinterpD64asI64",
+   "Iop_Add32Fx4", "Iop_Sub32Fx4", "Iop_Mul32Fx4", "Iop_Div32Fx4",
+   "Iop_Max32Fx4", "Iop_Min32Fx4", "Iop_Add32Fx2", "Iop_Sub32Fx2",
+   "Iop_CmpEQ32Fx4", "Iop_CmpLT32Fx4", "Iop_CmpLE32Fx4", "Iop_CmpUN32Fx4",
+   "Iop_CmpGT32Fx4", "Iop_CmpGE32Fx4", "Iop_PwMax32Fx4", "Iop_PwMin32Fx4",
+   "Iop_Abs32Fx4", "Iop_Neg32Fx4", "Iop_Sqrt32Fx4", "Iop_RecipEst32Fx4",
+   "Iop_RecipStep32Fx4", "Iop_RSqrtEst32Fx4", "Iop_RSqrtStep32Fx4",
+   "Iop_I32UtoFx4", "Iop_I32StoFx4", "Iop_FtoI32Ux4_RZ", "Iop_FtoI32Sx4_RZ",
+   "Iop_QFtoI32Ux4_RZ", "Iop_QFtoI32Sx4_RZ", "Iop_RoundF32x4_RM",
+   "Iop_RoundF32x4_RP", "Iop_RoundF32x4_RN", "Iop_RoundF32x4_RZ",
+   "Iop_F32ToFixed32Ux4_RZ", "Iop_F32ToFixed32Sx4_RZ",
+   "Iop_Fixed32UToF32x4_RN", "Iop_Fixed32SToF32x4_RN", "Iop_F32toF16x4",
+   "Iop_F16toF32x4", "Iop_F64toF16x2", "Iop_F16toF64x2", "Iop_Add32F0x4",
+   "Iop_Sub32F0x4", "Iop_Mul32F0x4", "Iop_Div32F0x4", "Iop_Max32F0x4",
+   "Iop_Min32F0x4", "Iop_CmpEQ32F0x4", "Iop_CmpLT32F0x4", "Iop_CmpLE32F0x4",
+   "Iop_CmpUN32F0x4", "Iop_RecipEst32F0x4", "Iop_Sqrt32F0x4",
+   "Iop_RSqrtEst32F0x4", "Iop_Add64Fx2", "Iop_Sub64Fx2", "Iop_Mul64Fx2",
+   "Iop_Div64Fx2", "Iop_Max64Fx2", "Iop_Min64Fx2", "Iop_CmpEQ64Fx2",
+   "Iop_CmpLT64Fx2", "Iop_CmpLE64Fx2", "Iop_CmpUN64Fx2", "Iop_Abs64Fx2",
+   "Iop_Neg64Fx2", "Iop_Sqrt64Fx2", "Iop_RecipEst64Fx2",
    "Iop_RecipStep64Fx2", "Iop_RSqrtEst64Fx2", "Iop_RSqrtStep64Fx2",
    "Iop_Add64F0x2", "Iop_Sub64F0x2", "Iop_Mul64F0x2", "Iop_Div64F0x2",
    "Iop_Max64F0x2", "Iop_Min64F0x2", "Iop_CmpEQ64F0x2", "Iop_CmpLT64F0x2",
@@ -308,30 +312,32 @@ static const HChar *cu_op_names[] = {
    "Iop_Reverse16sIn32_x4", "Iop_Reverse8sIn64_x2", "Iop_Reverse16sIn64_x2",
    "Iop_Reverse32sIn64_x2", "Iop_Reverse1sIn8_x16", "Iop_Perm8x16",
    "Iop_Perm32x4", "Iop_GetMSBs8x16", "Iop_RecipEst32Ux4",
-   "Iop_RSqrtEst32Ux4", "Iop_V256to64_0", "Iop_V256to64_1",
-   "Iop_V256to64_2", "Iop_V256to64_3", "Iop_64x4toV256", "Iop_V256toV128_0",
-   "Iop_V256toV128_1", "Iop_V128HLtoV256", "Iop_AndV256", "Iop_OrV256",
-   "Iop_XorV256", "Iop_NotV256", "Iop_CmpNEZ8x32", "Iop_CmpNEZ16x16",
-   "Iop_CmpNEZ32x8", "Iop_CmpNEZ64x4", "Iop_Add8x32", "Iop_Add16x16",
-   "Iop_Add32x8", "Iop_Add64x4", "Iop_Sub8x32", "Iop_Sub16x16",
-   "Iop_Sub32x8", "Iop_Sub64x4", "Iop_CmpEQ8x32", "Iop_CmpEQ16x16",
-   "Iop_CmpEQ32x8", "Iop_CmpEQ64x4", "Iop_CmpGT8Sx32", "Iop_CmpGT16Sx16",
-   "Iop_CmpGT32Sx8", "Iop_CmpGT64Sx4", "Iop_ShlN16x16", "Iop_ShlN32x8",
-   "Iop_ShlN64x4", "Iop_ShrN16x16", "Iop_ShrN32x8", "Iop_ShrN64x4",
-   "Iop_SarN16x16", "Iop_SarN32x8", "Iop_Max8Sx32", "Iop_Max16Sx16",
-   "Iop_Max32Sx8", "Iop_Max8Ux32", "Iop_Max16Ux16", "Iop_Max32Ux8",
-   "Iop_Min8Sx32", "Iop_Min16Sx16", "Iop_Min32Sx8", "Iop_Min8Ux32",
-   "Iop_Min16Ux16", "Iop_Min32Ux8", "Iop_Mul16x16", "Iop_Mul32x8",
-   "Iop_MulHi16Ux16", "Iop_MulHi16Sx16", "Iop_QAdd8Ux32", "Iop_QAdd16Ux16",
-   "Iop_QAdd8Sx32", "Iop_QAdd16Sx16", "Iop_QSub8Ux32", "Iop_QSub16Ux16",
-   "Iop_QSub8Sx32", "Iop_QSub16Sx16", "Iop_Avg8Ux32", "Iop_Avg16Ux16",
-   "Iop_Perm32x8", "Iop_CipherV128", "Iop_CipherLV128", "Iop_CipherSV128",
-   "Iop_NCipherV128", "Iop_NCipherLV128", "Iop_SHA512", "Iop_SHA256",
-   "Iop_Add64Fx4", "Iop_Sub64Fx4", "Iop_Mul64Fx4", "Iop_Div64Fx4",
-   "Iop_Add32Fx8", "Iop_Sub32Fx8", "Iop_Mul32Fx8", "Iop_Div32Fx8",
-   "Iop_Sqrt32Fx8", "Iop_Sqrt64Fx4", "Iop_RSqrtEst32Fx8",
-   "Iop_RecipEst32Fx8", "Iop_Max32Fx8", "Iop_Min32Fx8", "Iop_Max64Fx4",
-   "Iop_Min64Fx4", "Iop_LAST",
+   "Iop_RSqrtEst32Ux4", "Iop_MulI128by10", "Iop_MulI128by10Carry",
+   "Iop_MulI128by10E", "Iop_MulI128by10ECarry", "Iop_V256to64_0",
+   "Iop_V256to64_1", "Iop_V256to64_2", "Iop_V256to64_3", "Iop_64x4toV256",
+   "Iop_V256toV128_0", "Iop_V256toV128_1", "Iop_V128HLtoV256",
+   "Iop_AndV256", "Iop_OrV256", "Iop_XorV256", "Iop_NotV256",
+   "Iop_CmpNEZ8x32", "Iop_CmpNEZ16x16", "Iop_CmpNEZ32x8", "Iop_CmpNEZ64x4",
+   "Iop_Add8x32", "Iop_Add16x16", "Iop_Add32x8", "Iop_Add64x4",
+   "Iop_Sub8x32", "Iop_Sub16x16", "Iop_Sub32x8", "Iop_Sub64x4",
+   "Iop_CmpEQ8x32", "Iop_CmpEQ16x16", "Iop_CmpEQ32x8", "Iop_CmpEQ64x4",
+   "Iop_CmpGT8Sx32", "Iop_CmpGT16Sx16", "Iop_CmpGT32Sx8", "Iop_CmpGT64Sx4",
+   "Iop_ShlN16x16", "Iop_ShlN32x8", "Iop_ShlN64x4", "Iop_ShrN16x16",
+   "Iop_ShrN32x8", "Iop_ShrN64x4", "Iop_SarN16x16", "Iop_SarN32x8",
+   "Iop_Max8Sx32", "Iop_Max16Sx16", "Iop_Max32Sx8", "Iop_Max8Ux32",
+   "Iop_Max16Ux16", "Iop_Max32Ux8", "Iop_Min8Sx32", "Iop_Min16Sx16",
+   "Iop_Min32Sx8", "Iop_Min8Ux32", "Iop_Min16Ux16", "Iop_Min32Ux8",
+   "Iop_Mul16x16", "Iop_Mul32x8", "Iop_MulHi16Ux16", "Iop_MulHi16Sx16",
+   "Iop_QAdd8Ux32", "Iop_QAdd16Ux16", "Iop_QAdd8Sx32", "Iop_QAdd16Sx16",
+   "Iop_QSub8Ux32", "Iop_QSub16Ux16", "Iop_QSub8Sx32", "Iop_QSub16Sx16",
+   "Iop_Avg8Ux32", "Iop_Avg16Ux16", "Iop_Perm32x8", "Iop_CipherV128",
+   "Iop_CipherLV128", "Iop_CipherSV128", "Iop_NCipherV128",
+   "Iop_NCipherLV128", "Iop_SHA512", "Iop_SHA256", "Iop_Add64Fx4",
+   "Iop_Sub64Fx4", "Iop_Mul64Fx4", "Iop_Div64Fx4", "Iop_Add32Fx8",
+   "Iop_Sub32Fx8", "Iop_Mul32Fx8", "Iop_Div32Fx8", "Iop_Sqrt32Fx8",
+   "Iop_Sqrt64Fx4", "Iop_RSqrtEst32Fx8", "Iop_RecipEst32Fx8",
+   "Iop_Max32Fx8", "Iop_Min32Fx8", "Iop_Max64Fx4", "Iop_Min64Fx4",
+   "Iop_LAST",
 };
 
 static UShort cu_op_counts[] = {
@@ -343,29 +349,27 @@ static UShort cu_op_counts[] = {
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 2, 2, 2, 31, 1, 1, 1, 17, 2, 2, 3, 31, 1, 1, 1, 1, 3,
    3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 4, 4, 8, 64, 4, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 99, 99, 99, 31, 31, 31, 31, 1, 1, 99, 99, 1, 1, 1, 1, 1, 1, 2, 2, 2,
-   2, 5, 2, 2, 2, 2, 2, 2, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 4, 4, 8, 64, 99, 99, 99, 99, 4, 4, 2, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 99, 1, 1, 99, 99, 99, 99, 99, 99, 99, 99, 31, 31, 31, 31, 1,
+   1, 99, 99, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 5, 5, 99,
+   99, 99, 99, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 99, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 4, 31, 4, 4, 4, 65,
-   1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
-   1, 1, 2, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 0, 2, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 17, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 17, 1, 1, 1, 1, 1, 1, 1, 5, 2, 1,
-   1, 2, 31, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 31, 1, 1, 1, 1,
-   1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1,
-   1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 99, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+   1, 99, 99, 99, 99, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 4, 31, 4, 4, 4, 65, 1,
+   1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1,
+   1, 2, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 0, 2, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 99, 99, 1, 1, 1, 1, 2,
+   17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 99, 99, 1, 1, 2, 17, 1, 1, 1, 1, 1,
+   1, 1, 5, 2, 1, 1, 2, 31, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+   31, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,
+   2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -373,11 +377,15 @@ static UShort cu_op_counts[] = {
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-   1, 1, 1, 1, 1, 1, 1, 2, 31, 1, 1, 1, 17, 3, 5, 1, 1, 1, 1, 1, 1, 0,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 99, 99, 99, 99, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 31, 1, 1, 1, 17, 3,
+   5, 1, 1, 1, 1, 1, 1, 0,
 };
 
 #define NUM_LD 16
@@ -429,12 +437,17 @@ static Int cu_expr_cnt(IRExpr *expr)
       case Iex_ITE: return 1;
       case Iex_CCall: return 0;
       case Iex_VECRET: return 0;
-      case Iex_BBPTR: return 0;
+      case Iex_GSPTR: return 0;
    }
-   if (op - Iop_INVALID < NUM_OP) {
-      return cu_op_counts[op - Iop_INVALID];
-   } else {
+   if (op < Iop_INVALID) {
       return 0;
+   } else if (op - Iop_INVALID >= NUM_OP) {
+      return 0;
+   } else if (cu_op_counts[op - Iop_INVALID] == 99) {
+      VG_(printf)("bogus count for op: ~%s\n", cu_op_names[op - Iop_INVALID]);
+      return 0;
+   } else {
+      return cu_op_counts[op - Iop_INVALID];
    }
 }
 

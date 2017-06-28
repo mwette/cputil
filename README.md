@@ -39,19 +39,19 @@ int main() {
 
 ## Installation
 
-This works with valgrind-3.11.0.  Goal will be to work w/ >3.0.
+This works with valgrind-3.13.0.
 
 To install:
 
-1. Download and unpack valgring-3.11.0
+1. Download and unpack valgring-3.13.0
 
 2. Clone or otherwise install this cputil distribution in a directory
-   called *cputil* under valgrind-3.11.0
+   called *cputil* under valgrind-3.13.0
 
 3. in the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
-   .../valgring-3.11.0/cputil
+   .../valgring-3.13.0/cputil
    $ ./patch1
    ```
 
@@ -60,6 +60,12 @@ To install:
    $ ./configure --prefix=/usr/local
    $ make 
    $ make install
+   ```
+
+On MacOS 10.12 (Sierra), you may need to do the following
+   ```
+   $ CFLAGS="" ./configure --prefix=/usr/local \
+     ./configure --enable-only64bit --prefix=/usr/local
    ```
 
 4b. Optionally, if you want a minimal distribution, do this:

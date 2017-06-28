@@ -215,6 +215,10 @@
 64	Iop_DivF128
 4	Iop_NegF128
 4	Iop_AbsF128
+99	Iop_MAddF128
+99	Iop_MSubF128
+99	Iop_NegMAddF128
+99	Iop_NegMSubF128
 2	Iop_SqrtF128
 1	Iop_I32StoF128
 1	Iop_I64StoF128
@@ -228,8 +232,14 @@
 1	Iop_Yl2xF64
 1	Iop_Yl2xp1F64
 1	Iop_PRemF64
+99	Iop_F128toI128S
 1	Iop_PRemC3210F64
 1	Iop_PRem1F64
+99	Iop_RndF128
+99	Iop_TruncF128toI32S
+99	Iop_TruncF128toI32U
+99	Iop_TruncF128toI64U
+99	Iop_TruncF128toI64S
 1	Iop_PRem1C3210F64
 1	Iop_ScaleF64
 1	Iop_SinF64
@@ -260,6 +270,10 @@
 1	Iop_QAdd16Ux2
 1	Iop_QSub16Sx2
 1	Iop_QSub16Ux2
+99	Iop_MaxNumF64
+99	Iop_MinNumF64
+99	Iop_MaxNumF32
+99	Iop_MinNumF32
 1	Iop_HAdd16Ux2
 1	Iop_HAdd16Sx2
 1	Iop_HSub16Ux2
@@ -401,6 +415,10 @@
 1	Iop_Sal16x4
 1	Iop_Sal32x2
 1	Iop_Sal64x1
+99	Iop_Ctz8x16
+99	Iop_Ctz16x8
+99	Iop_Ctz32x4
+99	Iop_Ctz64x2
 1	Iop_ShlN8x8
 1	Iop_ShlN16x4
 1	Iop_ShlN32x2
@@ -555,6 +573,8 @@
 1	Iop_Min32F0x4
 1	Iop_CmpEQ32F0x4
 1	Iop_CmpLT32F0x4
+99	Iop_I128StoBCD128
+99	Iop_BCD128toI128S
 1	Iop_CmpLE32F0x4
 1	Iop_CmpUN32F0x4
 1	Iop_Recip32F0x4
@@ -596,6 +616,8 @@
 1	Iop_SetV128lo32
 1	Iop_NotV128
 1	Iop_AndV128
+99	Iop_F64toF16x2
+99	Iop_F16toF64x2
 1	Iop_OrV128
 1	Iop_XorV128
 1	Iop_ShlV128
@@ -847,3 +869,7 @@
 1	Iop_Min32Fx8
 1	Iop_Max64Fx4
 1	Iop_Min64Fx4
+99	Iop_MulI128by10
+99	Iop_MulI128by10Carry
+99	Iop_MulI128by10E
+99	Iop_MulI128by10ECarry
