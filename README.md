@@ -1,6 +1,6 @@
 # cputil - a valgrind tool for estimating CPU utilization
 
-Copyright (C) 2016-2017 -- Matthew R. Wette.
+Copyright (C) 2016-2018 -- Matthew R. Wette.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -14,6 +14,9 @@ published by the Free Software Foundation; either version 2 of the
 License, or (at your option) any later version.
 
 ## Introduction
+
+Note: The repository has branches, vg3.11.0 and vg3.13.0, cooresponding to 
+ports for each of the valgrind releases.
 
 This valgrind tool provides approximate cycle counts for user-defined
 regions of code.  It works on a per-thread basis.  The following program,
@@ -94,8 +97,8 @@ A dumped op table can be edited for clock counts and used for another run:
 
 ### Threads
 
-Support for multi-threaded code has been added.
-
+Support for multi-threaded code has been added.  Each thread must be 
+registered with cputil.
 
 ### Demo
 
