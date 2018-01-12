@@ -16,7 +16,9 @@ License, or (at your option) any later version.
 ## Introduction
 
 Note: The repository has branches, vg3.11.0 and vg3.13.0, cooresponding to 
-ports for each of the valgrind releases.
+ports for each of the valgrind releases.  That is,
+* if you are working with valgrind 3.11, check out the vg3.11.0 branch.
+* if you are working with valgrind 3.13, check out the vg3.13.0 branch.
 
 This valgrind tool provides approximate cycle counts for user-defined
 regions of code.  It works on a per-thread basis.  The following program,
