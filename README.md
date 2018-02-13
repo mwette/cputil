@@ -68,21 +68,21 @@ To build and install for valigrind-3.13.0:
 3. Clone or otherwise install this cputil distribution in a directory
    called *cputil* under valgrind-3.11.0
 
-3. in the subdirectory cputil, execute *patch1*:
+4. in the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
    .../valgring-3.13.0/cputil
    $ ./patch1
    ```
 
-4a. In the valgrind top directory run configure, make and install:
+5. In the valgrind top directory run configure, make and install:
    ```
    $ ./configure --prefix=/usr/local
    $ make 
    $ make install
    ```
 
-4b. Optionally, if you want a minimal distribution, do this:
+5. Optionally, if you want a minimal distribution, do this:
    ```
    $ ./configure --prefix=/usr/local
    $ mkdir -p /var/tmp/bindist
