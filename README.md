@@ -17,8 +17,8 @@ License, or (at your option) any later version.
 
 Note: The repository has branches, vg3.11.0 and vg3.13.0, cooresponding to 
 ports for each of the valgrind releases.  That is,
-* if you are working with valgrind 3.11, check out the vg3.11.0 branch.
-* if you are working with valgrind 3.13, check out the vg3.13.0 branch.
+* If you are working with valgrind 3.11, check out the vg3.11.0 branch.
+* If you are working with valgrind 3.13, check out the vg3.13.0 branch.
 
 This valgrind tool provides approximate cycle counts for user-defined
 regions of code.  It works on a per-thread basis.  The following program,
@@ -42,21 +42,36 @@ int main() {
 }
 ```
 
+Valgrind works by first converting binary programs to execute on
+the valgrind virtual CPU called VEX.  In the process of converting
+binary (e.g., x86_64 machine code) to VEX, the cputil tool add
+instructions to keep clock counts for executed code.  The user
+can add calls (CLRCTR and GETCTR) to clear and read the counter.
+The number of clock counts associated with each instruction are
+provided in a table.  The default table can be replace with a 
+user generated table at runtime.
+
 ## Installation
 
-This works with valgrind-3.11.0.  Goal will be to work w/ >3.0.
+This works with valgrind-3.11.0 and valgrind-3.13.0.  
+Our goal is to be compatible with major releases.  
 
-To install:
+To build and install for valigrind-3.13.0:
 
-1. Download and unpack valgring-3.11.0
+1. Checkout the 3.13 branch:
+   ```
+   $ git branch vg3.13.0
+   ```
 
-2. Clone or otherwise install this cputil distribution in a directory
+2. Download and unpack valgrind-3.11.0
+
+3. Clone or otherwise install this cputil distribution in a directory
    called *cputil* under valgrind-3.11.0
 
 3. in the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
-   .../valgring-3.11.0/cputil
+   .../valgring-3.13.0/cputil
    $ ./patch1
    ```
 
@@ -76,7 +91,7 @@ To install:
    $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
    ```
 
-### dumping the op-count tables
+### Dumping the op-count tables
 To dump the internal tables execute
    ```
    $ valgrind --tool=cputil --dump-op-tables=dump.cut true
@@ -85,10 +100,12 @@ There is no way to dump the op-tables w/o specifing a program to so
 we use use /bin/true.
 
 
-### loading user-defined op-count tables
+### Loading user-defined op-count tables
 A dumped op table can be edited for clock counts and used for another run:
    ```
-   $ valgrind --tool=cputil --load-op-tables=dump.cut my_program
+   $ cp dump.cut load.cut
+   $ edit load.cut
+   $ valgrind --tool=cputil --load-op-tables=load.cut my_program
    ```
 
 ### Threads
