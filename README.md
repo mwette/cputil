@@ -48,7 +48,7 @@ binary (e.g., x86_64 machine code) to VEX, the cputil tool add
 instructions to keep clock counts for executed code.  The user
 can add calls (CLRCTR and GETCTR) to clear and read the counter.
 The number of clock counts associated with each instruction are
-provided in a table.  The default table can be replace with a 
+provided in a table.  The default table can be replaced with a 
 user generated table at runtime.
 
 ## Installation
