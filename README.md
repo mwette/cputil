@@ -58,17 +58,28 @@ Our goal is to be compatible with major releases.
 
 To build and install for valigrind-3.13.0:
 
-1. Checkout the 3.13 branch:
+1. Checkout the 3.13 branch of cputil:
    ```
-   $ git branch vg3.13.0
+   $ git clone -b vg3.13.0 https://github.com/mwette/cputil
    ```
 
-2. Download and unpack valgrind-3.11.0
+2. Download and unpack valgrind-3.13.0
 
-3. Clone or otherwise install this cputil distribution in a directory
-   called *cputil* under valgrind-3.11.0
+3. Clone or otherwise install the cputil distribution into a (new)
+   directory called *cputil* under valgrind-3.11.0.  It should look like
+```
+AUTHORS				 darwin15.supp
+COPYING				 darwin16.supp
+...
+coregrind/			 tests/
+cputil/				 valgrind.pc.in
+darwin10-drd.supp		 valgrind.spec
+...
+darwin12.supp			 xfree-3.supp
+   
+```
 
-4. in the subdirectory cputil, execute *patch1*:
+4. In the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
    .../valgring-3.13.0/cputil
