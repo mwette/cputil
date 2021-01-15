@@ -40,6 +40,7 @@ int main() {
 ## Installation
 
 This works with valgrind-3.16.1.  I assume it will work with 3.16.X.
+To work with older versions of valgrind, try other git branches.
 
 To install:
 
