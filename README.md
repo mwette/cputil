@@ -134,6 +134,6 @@ from
 	https://bugs.kde.org/show_bug.cgi?id=401416#c3
 should help.  To apply, from valgring top directory, 
    ```
-   $ patch -p0 < cputil/patch/0001-Drop-MPI-1-support.patch
+   $ patch -b -p1 < cputil/patch/0001-Drop-MPI-1-support.patch
    ```
 
