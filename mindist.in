@@ -2,7 +2,7 @@
 #
 # mindist: create minimum distribution for running cputil
 #
-# Copyright (C) 2016 Matthew R. Wette
+# Copyright (C) 2016,2021 Matthew R. Wette
 # 
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
@@ -27,6 +27,7 @@ rm -f $dst/bin/ms_print
 rm -f $dst/bin/valgrind-di-server
 rm -f $dst/bin/valgrind-listener
 rm -f $dst/bin/vgdb
+rm -rf $dst/libexec
 if [ -f $dst/bin/valgrind ]; then
   mv $dst/bin/valgrind $destdir/$pkglibdir/valgrind
 fi

@@ -1,6 +1,6 @@
 /* cputil.h - part of valgrind cpu utilization tool
 
-   Copyright (C) 2013,2016 Matthew R. Wette
+   Copyright (C) 2013,2016,2021 Matthew R. Wette
    mwette@alumni.caltech.edu
 
    This program is free software; you can redistribute it and/or
@@ -495,56 +495,16 @@
 #elif defined(__linux__) && defined(__mips__)
 
 #define CU_REGTHR()	\
-	__extension__ ({ volatile unsigned int _zzq_args[6]; \
-	volatile unsigned int _zzq_result; _zzq_args[0] = (unsigned \
-	int)(0x43550001); _zzq_args[1] = (unsigned int)(0); \
-	_zzq_args[2] = (unsigned int)(0); _zzq_args[3] = (unsigned \
-	int)(0); _zzq_args[4] = (unsigned int)(0); _zzq_args[5] = \
-	(unsigned int)(0); __asm__ volatile("move $11, %1\n\t" \
-	"move $12, %2\n\t" "srl $0, $0, 13\n\t"  \
-	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
-	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
-	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
+	(0)
 
 #define CU_CLRCTR()	\
-	__extension__ ({ volatile unsigned int _zzq_args[6]; \
-	volatile unsigned int _zzq_result; _zzq_args[0] = (unsigned \
-	int)(0x43550002); _zzq_args[1] = (unsigned int)(0); \
-	_zzq_args[2] = (unsigned int)(0); _zzq_args[3] = (unsigned \
-	int)(0); _zzq_args[4] = (unsigned int)(0); _zzq_args[5] = \
-	(unsigned int)(0); __asm__ volatile("move $11, %1\n\t" \
-	"move $12, %2\n\t" "srl $0, $0, 13\n\t"  \
-	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
-	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
-	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
+	(0)
 
 #define CU_GETCTR()	\
-	__extension__ ({ volatile unsigned int _zzq_args[6]; \
-	volatile unsigned int _zzq_result; _zzq_args[0] = (unsigned \
-	int)(0x43550003); _zzq_args[1] = (unsigned int)(0); \
-	_zzq_args[2] = (unsigned int)(0); _zzq_args[3] = (unsigned \
-	int)(0); _zzq_args[4] = (unsigned int)(0); _zzq_args[5] = \
-	(unsigned int)(0); __asm__ volatile("move $11, %1\n\t" \
-	"move $12, %2\n\t" "srl $0, $0, 13\n\t"  \
-	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
-	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
-	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
+	(0)
 
 #define CU_GETDIV()	\
-	__extension__ ({ volatile unsigned int _zzq_args[6]; \
-	volatile unsigned int _zzq_result; _zzq_args[0] = (unsigned \
-	int)(0x43550004); _zzq_args[1] = (unsigned int)(0); \
-	_zzq_args[2] = (unsigned int)(0); _zzq_args[3] = (unsigned \
-	int)(0); _zzq_args[4] = (unsigned int)(0); _zzq_args[5] = \
-	(unsigned int)(0); __asm__ volatile("move $11, %1\n\t" \
-	"move $12, %2\n\t" "srl $0, $0, 13\n\t"  \
-	"srl $0, $0, 29\n\t" "srl $0, $0, 3\n\t"  \
-	"srl $0, $0, 19\n\t" "or $13, $13, $13\n\t"  \
-	"move %0, $11\n\t" : "=r" (_zzq_result) : "r" (0), "r" \
-	(&_zzq_args[0]) : "$11", "$12"); _zzq_result; })
+	(0)
 
 #else
 #define CU_REGTHR() 0

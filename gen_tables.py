@@ -2,10 +2,12 @@
 #
 # gen_tables.py - generate blank table or load (default) table into cu_main.c
 #
-# Copyright (C) 2013,2016-2017 Matthew R. Wette
+# Copyright (C) 2013,2016-2017,2021 Matthew R. Wette
 #
 # usage for new ../VEX/pub/libvex_ir.h (new release)
-#   $ ./gen_tables.py -d
+#   $ ./gen_tables.py -d		# this generated cuts/zero.cut.new
+#   In cuts, update default.cut from zero.cut.new
+#   Then execute the following:
 # usage for working cuts/default.cut table
 #   $ ./gen_tables.py
 #

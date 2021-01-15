@@ -1,0 +1,22 @@
+--- ../configure.ac-orig	2021-01-15 08:10:23.478087143 -0800
++++ ../configure.ac	2021-01-15 08:21:19.799236107 -0800
+@@ -4828,6 +4828,9 @@
+    dhat/tests/Makefile
+    lackey/Makefile
+    lackey/tests/Makefile
++   cputil/Makefile
++   cputil/tests/Makefile
++   cputil/mindist
+    none/Makefile
+    none/tests/Makefile
+    none/tests/scripts/Makefile
+--- ../Makefile.am-orig	2021-01-15 08:22:28.666752212 -0800
++++ ../Makefile.am	2021-01-15 08:22:39.502674199 -0800
+@@ -12,6 +12,7 @@
+ 		massif \
+ 		dhat \
+ 		lackey \
++		cputil \
+ 		none
+ 
+ EXP_TOOLS = \

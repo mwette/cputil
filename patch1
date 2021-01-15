@@ -1,11 +1,13 @@
 #!/bin/sh
 #
-# Copyright (C) 2016 Matthew R. Wette
+# Copyright (C) 2016,2021 Matthew R. Wette
 # 
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
 # notice and this notice are preserved.  This file is offered as-is,
 # without any warranty.
+
+touch configure.in
 
 # fix configure
 if [ ! -f ../configure-orig ]; then
@@ -21,6 +23,8 @@ w
 q
 EndOfInput
 
+touch Makefile.in
+
 # fix Makefile.in
 if [ ! -f ../Makefile.in-orig ]; then
   cp ../Makefile.in ../Makefile.in-orig
@@ -30,35 +34,6 @@ ed ../Makefile.in <<'EndOfInput'
 /		none
 i
 		cputil \
-.
-w
-q
-EndOfInput
-
-# fix Makefile.am
-if [ ! -f ../Makefile.am-orig ]; then
-  cp ../Makefile.am ../Makefile.am-orig
-fi
-ed ../Makefile.am <<'EndOfInput'
-/TOOLS = 
-/		none
-i
-		cputil \
-.
-w
-q
-EndOfInput
-
-# fix configure.ac
-if [ ! -f ../configure.ac-orig ]; then
-  cp ../configure.ac ../configure.ac-orig
-fi
-ed ../configure.ac <<'EndOfInput'
-/AC_CONFIG_FILES(
-/   none\/Makefile
-i
-   cputil/Makefile
-   cputil/tests/Makefile
 .
 w
 q

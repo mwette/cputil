@@ -1,6 +1,6 @@
 # cputil - a valgrind tool for estimating CPU utilization
 
-Copyright (C) 2016-2017 -- Matthew R. Wette.
+Copyright (C) 2016-2017,2021 -- Matthew R. Wette.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -39,42 +39,57 @@ int main() {
 
 ## Installation
 
-This works with valgrind-3.13.0.
+This works with valgrind-3.16.1.  I assume it will work with 3.16.X.
 
 To install:
 
-1. Download and unpack valgring-3.13.0
+1. Download and unpack valgrind-3.16.X
 
 2. Clone or otherwise install this cputil distribution in a directory
-   called *cputil* under valgrind-3.13.0
+   called *cputil* under valgrind-3.16.X
 
-3. in the subdirectory cputil, execute *patch1*:
+3. In the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
-   .../valgring-3.13.0/cputil
+   .../valgring-3.16.X/cputil
    $ ./patch1
+   ```
+
+   Note that the above tries to edit the autogenerted configure and
+   Makefile.in files.  If that does not work then you can try
+   ```
+   $ cd ..
+   $ patch -b -p0 cputil/patch/valgrind1.patch
+   $ ./autogen.sh
    ```
 
 4a. In the valgrind top directory run configure, make and install:
    ```
    $ ./configure --prefix=/usr/local
    $ make 
-   $ make install
+   $ sudo make install
    ```
 
-On MacOS 10.12 (Sierra), you may need to do the following
+On macOS, you may need to perform the following steps:
    ```
    $ CFLAGS="" ./configure --prefix=/usr/local \
      ./configure --enable-only64bit --prefix=/usr/local
    ```
 
-4b. Optionally, if you want a minimal distribution, do this:
+4b. Optionally, if you want a minimal distribution, do use this sequence:
    ```
    $ ./configure --prefix=/usr/local
    $ mkdir -p /var/tmp/bindist
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil
    $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
    $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
+   ```
+The above will generate a distribution.  To install, become root if necessary,
+then execute the following:
+   ```
+   # cd /var/tmp/bindist
+   # cd usr/local
+   # tar cf - . | (cd /usr/local; tar xvf -)
    ```
 
 ### dumping the op-count tables
@@ -100,3 +115,25 @@ Support for multi-threaded code has been added.
 ### Demo
 
 Look in cputil/tests/demo1.c
+
+### Other issues
+
+If you see the following error during compilation then your version of 
+valgrind still does works to MPI1.  
+
+  libmpiwrap.c: In function 'showTy':
+  libmpiwrap.c:281:19: error: 'MPI_UB' undeclared (first use in this function);
+      did you mean 'MPI_IO'?
+    281 |    else if (ty == MPI_UB)             fprintf(f,"UB");
+        |                   ^~~~~~
+        |                   MPI_IO
+
+The included patch
+	0001-Drop-MPI-1-support.patch
+from
+	https://bugs.kde.org/show_bug.cgi?id=401416#c3
+should help.  To apply, from valgring top directory, 
+   ```
+   $ patch -p0 < cputil/patch/0001-Drop-MPI-1-support.patch
+   ```
+
