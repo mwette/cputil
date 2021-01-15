@@ -93,19 +93,19 @@ then execute the following:
    # tar cf - . | (cd /usr/local; tar xvf -)
    ```
 
-### dumping the op-count tables
-To dump the internal tables execute
+### dumping the op-count table
+To dump the internal table execute
    ```
-   $ valgrind --tool=cputil --dump-op-tables=dump.cut true
+   $ valgrind --tool=cputil --dump-op-table=dump.cut true
    ```
-There is no way to dump the op-tables w/o specifing a program to so
+There is no way to dump the op-table w/o specifing a program to so
 we use use /bin/true.
 
 
-### loading user-defined op-count tables
+### loading user-defined op-count table
 A dumped op table can be edited for clock counts and used for another run:
    ```
-   $ valgrind --tool=cputil --load-op-tables=dump.cut my_program
+   $ valgrind --tool=cputil --load-op-table=dump.cut my_program
    ```
 
 ### Threads
