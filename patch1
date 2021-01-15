@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Copyright (C) 2016,2021 Matthew R. Wette
+# 
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+touch configure.in
+
+# fix configure
+if [ ! -f ../configure-orig ]; then
+  cp ../configure ../configure-orig
+fi
+ed ../configure <<'EndOfInput'
+/^cat >confcache 
+i
+ac_config_files="$ac_config_files cputil/Makefile cputil/tests/Makefile"
+ac_config_files="$ac_config_files cputil/mindist"
+.
+w
+q
+EndOfInput
+
+touch Makefile.in
+
+# fix Makefile.in
+if [ ! -f ../Makefile.in-orig ]; then
+  cp ../Makefile.in ../Makefile.in-orig
+fi
+ed ../Makefile.in <<'EndOfInput'
+/TOOLS = 
+/		none
+i
+		cputil \
+.
+w
+q
+EndOfInput
+
+# --- last line ---
