@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# rundemo
+#
+# v131123a
+
+vgdir=../..
+
+VALGRIND_LIB=$vgdir/.in_place
+export VALGRIND_LIB
+
+vg=$vgdir/coregrind/valgrind
+
+if [ $# -eq 0 ]; then
+    echo "usage: rundemo [-x|-t|-d|-l] [demo1|demo2]"
+    echo "       -x  print full command string and exit"
+    echo "       -t  dump trace information to stderr"
+    echo "       -d  dump op table to file dump.cnt"
+    echo "       -l  load op table from file load.cnt"
+fi
+
+verb="-q"
+vga=""
+shownoexec=0
+while [ $# -gt 0 ]; do
+  case $1 in
+  -v) verb=""; ;;
+  -t) vga="$vga --trace-flags=00100000 --trace-notbelow=0"; ;;
+  -d) xpa="$xpa --dump-op-table=dump.cnt"; ;;
+  -l) xpa="$xpa --load-op-table=load.cnt"; ;;
+  -x) shownoexec=1; ;;
+  demo*) demo=./$1; ;;
+  *) demo=$1; ;;
+  esac
+  shift
+done
+
+if [ $shownoexec -eq 1 ]; then
+  echo $vg $verb $vga --tool=cputil $xpa $demo
+  exit
+fi
+exec $vg $verb $vga --tool=cputil $xpa $demo
+
+# old stuff
+#$vg $va --tool=cputil --help
+#$vg $va --tool=cputil --version # does not work
+#$vg $va --tool=cputil --dump-op-table=dump.cnt demo1
+#$vg $va --tool=cputil --load-op-table=load.cnt demo1
+#$vg $va --tool=cputil demo1
+
+# --- last line of rundemo ---
