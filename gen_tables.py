@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # gen_tables.py - generate blank table or load (default) table into cu_main.c
 #
@@ -29,7 +29,7 @@
 # v170626a - mwette@alumni.caltech.edu
 
 import sys, os, re
-from string import join, whitespace
+from string import whitespace
 import pdb
 from gen_utils import write_w_fill, replace_in_code, move_if_changed
 
@@ -72,7 +72,7 @@ def parse_enum(lines):
     """
     Given lines from enum guts, return list of enum names. 
     """
-    text0 = join(lines)
+    text0 = " ".join(lines)
     while True:
         m = rx1c.match(text0)
         if not m: 
@@ -158,14 +158,14 @@ def read_counts(filename, lenums, oenums):
     while l0:
         c,s = l0.split()
         if s != lenums[i]:
-            raise Exception, "%s: line %d: mismatch: %s" % (filename, n0, s)
+            raise Exception("%s: line %d: mismatch: %s" % (filename, n0, s))
         ty_pairs.append((s,c))
         i = i + 1
         if i >= nld:
             break
         l0 = f0.readline(); n0 += 1
     if len(ty_pairs) != nld:
-        raise Exception, "count mismatch"
+        raise Exception("count mismatch")
     tdict['ty_pairs'] = ty_pairs
     # read operations
     l0 = f0.readline(); n0 += 1
@@ -182,7 +182,7 @@ def read_counts(filename, lenums, oenums):
     while l0:
         c,s = l0.split()
         if s != oenums[i]:
-            raise Exception, "%s: line %d: mismatch: %s" % (filename, n0, s)
+            raise Exception("%s: line %d: mismatch: %s" % (filename, n0, s))
         op_pairs.append((s,c))
         i = i + 1
         if i >= nop:
@@ -191,7 +191,7 @@ def read_counts(filename, lenums, oenums):
         pass
     if len(op_pairs) != nop:
         pdb.set_trace()
-        raise Exception, "count mismatch"
+        raise Exception("count mismatch")
     tdict['op_pairs'] = op_pairs
     #
     f0.close()
@@ -204,7 +204,7 @@ def fill_names(tag, names, f1):
     """
     f1.write("#define NUM_%s %d\n" % (tag.upper(), len(names)))
     if not names[0].endswith("INVALID"):
-        raise Exception, "expecting INVALID as first element"
+        raise Exception("expecting INVALID as first element")
     f1.write("static const HChar *cu_%s_names[] = {\n  " % (tag,))
     col = 2
     for e in names:
@@ -225,13 +225,13 @@ def fill_all(tdict, f1):
     lpairs = tdict['ty_pairs']
     opairs = tdict['op_pairs']
     divizr = tdict['divisor']
-    fill_names("op", map(lambda p: p[0], opairs), f1)
+    fill_names("op", list(map(lambda p: p[0], opairs)), f1)
     f1.write("\n")
-    fill_counts("op", map(lambda p: p[1], opairs), f1)
+    fill_counts("op", list(map(lambda p: p[1], opairs)), f1)
     f1.write("\n")
-    fill_names("ld", map(lambda p: p[0], lpairs), f1)
+    fill_names("ld", list(map(lambda p: p[0], lpairs)), f1)
     f1.write("\n")
-    fill_counts("ld", map(lambda p: p[1], lpairs), f1)
+    fill_counts("ld", list(map(lambda p: p[1], lpairs)), f1)
     f1.write("\n")
     f1.write("static UWord cu_divisor = %s;\n" % divizr)
 
@@ -254,19 +254,19 @@ if True:
     for opt in opts:
         k,v = opt
         if k == "-d":
-            print "dumping to cuts/zero.cut.new ..."
+            print("dumping to cuts/zero.cut.new ...")
             get_all_enums()
             dump_blank_counts(ty_enums, op_enums, "cuts/zero.cut.new")
             sys.exit(0)
     else:
-        print "updating cu_main.c ..."
+        print("updating cu_main.c ...")
         get_all_enums()
         tdict = read_counts("cuts/default.cut", ty_enums, op_enums)
         replace_in_code(tdict, "cu_main.c", "count_tables", fill_all)
         res = move_if_changed("cu_main.c")
         if res:
-            print "cu_main.c changed"
+            print("cu_main.c changed")
         else:
-            print "cu_main.c not changed"
+            print("cu_main.c not changed")
 
 # --- last line of gen_tables.py ---

@@ -1,5 +1,5 @@
 # default valgrind/cputil count table
-# for valgrind-3.16.1
+# for valgrind-3.17.0
 #
 # ppc750 rough estimate
 #
@@ -127,10 +127,14 @@
 19	Iop_DivS32
 19	Iop_DivU64
 19	Iop_DivS64
-19	Iop_DivU64E
-19	Iop_DivS64E
+59	Iop_DivU128
+59	Iop_DivS128
 19	Iop_DivU32E
 19	Iop_DivS32E
+19	Iop_DivU64E
+19	Iop_DivS64E
+59	Iop_DivU128E
+59	Iop_DivS128E
 19	Iop_DivModU64to32
 19	Iop_DivModS64to32
 19	Iop_DivModU128to64
@@ -139,6 +143,8 @@
 19	Iop_DivModU64to64
 19	Iop_DivModS32to32
 19	Iop_DivModU32to32
+1	Iop_ModU128
+1	Iop_ModS128
 1	Iop_8Uto16
 1	Iop_8Uto32
 1	Iop_8Uto64
@@ -194,8 +200,11 @@
 1	Iop_AbsF64
 1	Iop_NegF32
 1	Iop_AbsF32
+1	Iop_NegF16
+1	Iop_AbsF16
 3	Iop_SqrtF64
 3	Iop_SqrtF32
+3	Iop_SqrtF16
 1	Iop_CmpF64
 1	Iop_CmpF32
 1	Iop_CmpF128
@@ -218,6 +227,10 @@
 1	Iop_I64StoF32
 1	Iop_F32toF64
 1	Iop_F64toF32
+1	Iop_ReinterpV128asI128
+1	Iop_ReinterpI128asV128
+1	Iop_ReinterpF128asI128
+1	Iop_ReinterpI128asF128
 1	Iop_ReinterpF64asI64
 1	Iop_ReinterpI64asF64
 1	Iop_ReinterpF32asI32
@@ -242,6 +255,8 @@
 1	Iop_I64UtoF128
 1	Iop_F32toF128
 1	Iop_F64toF128
+1	Iop_I128UtoF128
+1	Iop_I128StoF128
 1	Iop_F128toI32S
 1	Iop_F128toI64S
 1	Iop_F128toI32U
@@ -254,6 +269,8 @@
 99	Iop_TruncF128toI32U
 99	Iop_TruncF128toI64U
 99	Iop_TruncF128toI64S
+99	Iop_TruncF128toI128U
+99	Iop_TruncF128toI128S
 99	Iop_AtanF64
 99	Iop_Yl2xF64
 99	Iop_Yl2xp1F64
@@ -534,6 +551,7 @@
 2	Iop_I32UtoD128
 2	Iop_I64StoD128
 2	Iop_I64UtoD128
+2	Iop_I128StoD128
 1	Iop_D64toD32
 2	Iop_D128toD64
 1	Iop_I32StoD64
@@ -548,6 +566,7 @@
 2	Iop_D128toI32U
 2	Iop_D128toI64S
 2	Iop_D128toI64U
+2	Iop_D128toI128S
 1	Iop_F32toD32
 1	Iop_F32toD64
 2	Iop_F32toD128
@@ -593,6 +612,7 @@
 99	Iop_BCD128toI128S
 1	Iop_ReinterpI64asD64
 1	Iop_ReinterpD64asI64
+1	Iop_Add16Fx8
 1	Iop_Add32Fx4
 1	Iop_Sub32Fx4
 2	Iop_Mul32Fx4
@@ -609,8 +629,11 @@
 1	Iop_CmpGE32Fx4
 1	Iop_PwMax32Fx4
 1	Iop_PwMin32Fx4
+1	Iop_Abs16Fx8
 1	Iop_Abs32Fx4
+1	Iop_Neg16Fx8
 1	Iop_Neg32Fx4
+2	Iop_Sqrt16Fx8
 2	Iop_Sqrt32Fx4
 1	Iop_RecipEst32Fx4
 1	Iop_RecipStep32Fx4
@@ -1023,6 +1046,7 @@
 99	Iop_MulI128by10Carry
 99	Iop_MulI128by10E
 99	Iop_MulI128by10ECarry
+1	Iop_2xMultU64Add128CarryOut
 1	Iop_V256to64_0
 1	Iop_V256to64_1
 1	Iop_V256to64_2

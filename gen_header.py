@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # gen_header.py - generate portable header
 #
@@ -113,7 +113,7 @@ def massage_defs(defs, enumd):
     for d0 in defs:
         m = rx4.match(d0)
         if not m:
-            raise Exception, "can't handle " + d0
+            raise Exception("can't handle " + d0)
         if m.group(1).startswith("XPROF_"):
             lval = "#define " \
                 + re.sub("XPROF_", "XPROF_", m.group(1)) + m.group(2)
@@ -260,7 +260,7 @@ def genxhdr1(stuff, f1):
         el = "el"
         for xdef in xdefs:
             m = rx4.match(xdef)
-            if not m: raise Exception, "NO MATCH"
+            if not m: raise Exception("NO MATCH")
             lval = "#define " + m.group(1) + m.group(2)
             if ix == 0: defl.append(lval)
             f1.write(lval + "\t\\\n")
@@ -295,12 +295,12 @@ def chopup(line, mx = 60):
         while line[nd-1] != " ":
             nd = nd - 1
             if nd == st:
-                raise Exception, "can't handle no spaces"
+                raise Exception("can't handle no spaces")
         while line[nd-1] == " ": nd = nd - 1 # back up to no spaces
         if line.count("\"", st, nd) % 2 != 0:
             #pdb.set_trace()
             ix = line.rfind("\"", st, nd)
-            if ix < 0: raise Exception, "chopup: bad line"
+            if ix < 0: raise Exception("chopup: bad line")
             if st + ix > mx/2:
                 nd = ix
             else:
@@ -329,11 +329,5 @@ if True:
     fname = "cputil.h"
     replace_in_code((defcombos,xdefd), fname,  "autocoding", genxhdr1)
     move_if_changed(fname)
-
-if False:
-    for qc in defcombos:
-        #v = qr_expand(qc)[1:-1]
-        v = qr_mindefs(qc)
-        print v
 
 # --- last line of gen_header.py ---
