@@ -130,64 +130,64 @@ def read_counts(filename, lenums, oenums):
     ty_pairs = []
     op_pairs = []
     #
-    f0 = open(filename, "r")
-    l0 = f0.readline()
+    f0 = open(filename, "r"); n0 = 0
+    l0 = f0.readline(); n0 += 1
     # read properties
     while l0:
         if l0[0] == '#':
-            l0 = f0.readline()
+            l0 = f0.readline(); n0 += 1
             continue
         c,s = l0.split()
         if s not in propl:
             break
         tdict[s] = c
-        l0 = f0.readline()
+        l0 = f0.readline(); n0 += 1
         pass
     # read load statements
     while l0:
         if l0[0] == '#':
-            l0 = f0.readline()
+            l0 = f0.readline(); n0 += 1
             continue
         c,s = l0.split()
         if s == lenums[1]:              # skip INVALID = lenums[0]
             break
-        l0 = f0.readline()
+        l0 = f0.readline(); n0 += 1
         pass
     ty_pairs = [(lenums[0], "0")]
     i = 1                               # skip INVALID
     while l0:
         c,s = l0.split()
         if s != lenums[i]:
-            raise Exception, "mismatch: " + s
+            raise Exception, "%s: line %d: mismatch: %s" % (filename, n0, s)
         ty_pairs.append((s,c))
         i = i + 1
         if i >= nld:
             break
-        l0 = f0.readline()
+        l0 = f0.readline(); n0 += 1
     if len(ty_pairs) != nld:
         raise Exception, "count mismatch"
     tdict['ty_pairs'] = ty_pairs
     # read operations
-    l0 = f0.readline()
+    l0 = f0.readline(); n0 += 1
     while l0:
         if l0[0] == '#':
-            l0 = f0.readline()
+            l0 = f0.readline(); n0 += 1
             continue
         c,s = l0.split()
         if s == oenums[1]:              # skip INVALID = lenums[0]
             break
-        l0 = f0.readline()
+        l0 = f0.readline(); n0 += 1
     op_pairs = [(oenums[0], "0")]
     i = 1                               # skip INVALID
     while l0:
         c,s = l0.split()
         if s != oenums[i]:
-            raise Exception, "mismatch: " + s
+            raise Exception, "%s: line %d: mismatch: %s" % (filename, n0, s)
         op_pairs.append((s,c))
         i = i + 1
         if i >= nop:
             break
-        l0 = f0.readline()
+        l0 = f0.readline(); n0 += 1
         pass
     if len(op_pairs) != nop:
         pdb.set_trace()
