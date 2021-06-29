@@ -12,71 +12,71 @@
 prefix=@prefix@
 srcdist=..
 
-if [ $# -ne 2 ]; then
-  echo "usage: mindist <destdir> <pkglibdir>"
+if [ $# -ne 1 ]; then
+  echo "usage: mindist <destdir>"
   exit 1
 fi
 destdir=$1
-pkglibdir=$2
 
-dst=$destdir/$prefix
+top=$destdir/$prefix
+exe=$exe
 
-rm -f $dst/bin/callgrind*
-rm -f $dst/bin/cg_*
-rm -f $dst/bin/ms_print
-rm -f $dst/bin/valgrind-di-server
-rm -f $dst/bin/valgrind-listener
-rm -f $dst/bin/vgdb
-rm -rf $dst/libexec
-if [ -f $dst/bin/valgrind ]; then
-  mv $dst/bin/valgrind $destdir/$pkglibdir/valgrind
+rm -f $top/bin/callgrind*
+rm -f $top/bin/cg_*
+rm -f $top/bin/ms_print
+rm -f $top/bin/valgrind-di-server
+rm -f $top/bin/valgrind-listener
+rm -f $top/bin/vgdb
+#rm -rf $top/libexec
+if [ -f $top/bin/valgrind ]; then
+  mv $top/bin/valgrind $exe/valgrind
 fi
 #
-if [ -f $dst/include/valgrind/libvex_ir.h ]; then
-  cp $dst/include/valgrind/libvex_ir.h $destdir/$pkglibdir/
+if [ -f $top/include/valgrind/libvex_ir.h ]; then
+  cp $top/include/valgrind/libvex_ir.h $exe/
 fi
-if [ -f $dst/include/valgrind/cputil.h ]; then
-   mv $dst/include/valgrind/cputil.h $dst/
+if [ -f $top/include/valgrind/cputil.h ]; then
+   mv $top/include/valgrind/cputil.h $top/
 fi
-rm -rf $dst/include
-mkdir -p $dst/include
-if [ -f $dst/cputil.h ]; then
-  mv $dst/cputil.h $dst/include/
+rm -rf $top/include
+mkdir -p $top/include
+if [ -f $top/cputil.h ]; then
+  mv $top/cputil.h $top/include/
 fi
-rm -rf $destdir/$prefix/share
-rm -rf $destdir/$prefix/lib/pkgconfig
+rm -rf $top/share
+rm -rf $top/lib/pkgconfig
 #
-rm -rf $destdir/$pkglibdir/vgpreload_memcheck*
-rm -rf $destdir/$pkglibdir/vgpreload_massif*
-rm -rf $destdir/$pkglibdir/vgpreload_exp*
-rm -rf $destdir/$pkglibdir/vgpreload_drd*
-rm -rf $destdir/$pkglibdir/vgpreload_helgrind*
+rm -rf $exe/vgpreload_memcheck*
+rm -rf $exe/vgpreload_massif*
+rm -rf $exe/vgpreload_exp*
+rm -rf $exe/vgpreload_drd*
+rm -rf $exe/vgpreload_helgrind*
 #
-rm  -f $destdir/$pkglibdir/s390*
-rm  -f $destdir/$pkglibdir/power*
-rm  -f $destdir/$pkglibdir/mips*
-rm  -f $destdir/$pkglibdir/arm*
+rm  -f $exe/s390*
+rm  -f $exe/power*
+rm  -f $exe/mips*
+rm  -f $exe/arm*
 #
-rm -rf $destdir/$pkglibdir/none*
-rm -rf $destdir/$pkglibdir/memcheck*
-rm -rf $destdir/$pkglibdir/massif*
-rm -rf $destdir/$pkglibdir/getoff*
-rm -rf $destdir/$pkglibdir/helgrind*
-rm -rf $destdir/$pkglibdir/lackey*
-rm -rf $destdir/$pkglibdir/exp*
-rm -rf $destdir/$pkglibdir/drd*
-rm -rf $destdir/$pkglibdir/cachegrind*
-rm -rf $destdir/$pkglibdir/callgrind*
+rm -rf $exe/none*
+rm -rf $exe/memcheck*
+rm -rf $exe/massif*
+rm -rf $exe/getoff*
+rm -rf $exe/helgrind*
+rm -rf $exe/lackey*
+rm -rf $exe/exp*
+rm -rf $exe/drd*
+rm -rf $exe/cachegrind*
+rm -rf $exe/callgrind*
 #
-rm  -f $destdir/$pkglibdir/*.xml
-rm  -f $destdir/$pkglibdir/*.a
-rm  -f $destdir/$pkglibdir/default.supp
+rm  -f $exe/*.xml
+rm  -f $exe/*.a
+rm  -f $exe/default.supp
 #
 
-echo "#!/bin/sh" >$dst/bin/cputil
-echo "VALGRIND_LIB=$pkglibdir" >>$dst/bin/cputil
-echo "#export VALGRIND_LIB" >>$dst/bin/cputil
-echo "\$VALGRIND_LIB/valgrind -q" '--tool=cputil "$@"' >>$dst/bin/cputil
-chmod +x $dst/bin/cputil
+echo "#!/bin/sh" >$top/bin/cputil
+echo "VALGRIND_LIB=$pkglibdir" >>$top/bin/cputil
+echo "#export VALGRIND_LIB" >>$top/bin/cputil
+echo "\$VALGRIND_LIB/valgrind -q" '--tool=cputil "$@"' >>$top/bin/cputil
+chmod +x $top/bin/cputil
 
 # --- last line of mindist ---

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # gen_utils.py - utils for gen_header and gen_tables
 #
@@ -61,7 +61,7 @@ def replace_in_code(arg, fname, tag, rout):
         # no tag found
         f0.close()
         f1.close()
-        print "*** no beg tag found"
+        print("*** no beg tag found")
         return
     # Insert user code.
     rout(arg, f1)
@@ -92,8 +92,8 @@ def move_if_changed(fname):
     fname_old = fname + ".old"
     fname_new = fname + ".new"
     if os.system("cmp " + fname + " " + fname_new + ">/dev/null"):
-	os.rename(fname, fname_old)
-	os.rename(fname_new, fname)
+        os.rename(fname, fname_old)
+        os.rename(fname_new, fname)
         return True
     else:
         return False
