@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# upd-vg-files
+#
+
+if [ ! -f configure.ac ]; then
+  echo "expecting to see configure.ac -- quitting"
+  exit 1
+fi
+if [ ! -f configure.ac-orig ]; then
+  mv configure.ac configure.ac-orig
+fi
+if [ ! -f Makefile.am-orig ]; then
+  mv Makefile.am Makefile.am-orig
+fi
+
+cp configure.ac-orig confgure.ac
+ed -s configure.ac  << 'EndOfInput'
+/^   none\/Makefile/
+i
+  cputil/Makefile
+  cputil/tests/Makefile
+  cputil/mindist
+.
+wq
+EndOfInput
+
+cp Makefile.am-orig Makefile.am
+ed -s Makefile.am  << 'EndOfInput'
+/^		none/
+i
+		cputil \
+.
+wq
+EndOfInput
+
+# --- last line ---

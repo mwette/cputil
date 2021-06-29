@@ -39,20 +39,20 @@ int main() {
 
 ## Installation
 
-This works with valgrind-3.16.1.  I assume it will work with 3.16.X.
+This works with valgrind-3.17.0.  I assume it will work with 3.17.X.
 To work with older versions of valgrind, try other git branches.
 
 To install:
 
-1. Download and unpack valgrind-3.16.X
+1. Download and unpack valgrind-3.17.X
 
 2. Clone or otherwise install this cputil distribution in a directory
-   called *cputil* under valgrind-3.16.X
+   called *cputil* under valgrind-3.17.X
 
 3. In the subdirectory cputil, execute *patch1*:
    ```
    $ pwd
-   .../valgring-3.16.X/cputil
+   .../valgring-3.17.X/cputil
    $ ./patch1
    ```
 
@@ -60,12 +60,12 @@ To install:
    Makefile.in files.  If that does not work then you can try
    ```
    $ cd ..
-   $ patch -b -p0 cputil/patch/valgrind1.patch
+   $ cputil/patch/upd-vg-files
    $ ./autogen.sh
    ```
 
 4a. In the valgrind top directory run configure, make and install:
-   ```
+   ``
    $ ./configure --prefix=/usr/local
    $ make 
    $ sudo make install
