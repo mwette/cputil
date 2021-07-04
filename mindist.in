@@ -10,73 +10,95 @@
 # without any warranty.
 
 prefix=@prefix@
-srcdist=..
+libexecdir=@libeexecdir@
+libdir=@libdir@
+includedir=@includedir@
 
-if [ $# -ne 1 ]; then
-  echo "usage: mindist <destdir>"
+fail () {
+  echo "usage: mindist DESTDIR=<dir>"
+  echo "example:"
+  echo "       mindist DESTDIR=/var/tmp/bindist"
   exit 1
-fi
-destdir=$1
+}
 
-top=$destdir/$prefix
-exe=$exe
-
-rm -f $top/bin/callgrind*
-rm -f $top/bin/cg_*
-rm -f $top/bin/ms_print
-rm -f $top/bin/valgrind-di-server
-rm -f $top/bin/valgrind-listener
-rm -f $top/bin/vgdb
-#rm -rf $top/libexec
-if [ -f $top/bin/valgrind ]; then
-  mv $top/bin/valgrind $exe/valgrind
+if [ $# -ne 1 ]; then fail; fi
+case $1 in 
+DESTDIR=*) destdir=`echo $1 | sed -e 's/DESTDIR=//'` ;;
+*) fail ;;
+esac
+if echo $destdir | grep '.*\/$'; then
+    true
+else
+    destdir=$destdir/
 fi
-#
+
+cu_execdir=`echo $libexecdir | sed -e 's/valgrind/cputil/'`
+top=$destdir$prefix
+exe=$destdir$libexecdir
+lib=$destdir$libdir
+inc=$destdir$includedir
+cu_exe=$destdir$cu_execdir
+
+if [ ! -f $top/bin/valgrind ]; then
+   echo "do not see $top/bin/valgrind -- quitting"
+   exit 1
+fi
+     
+mv $top/bin/valgrind $exe
+rm $top/bin/*
+
 if [ -f $top/include/valgrind/libvex_ir.h ]; then
-  cp $top/include/valgrind/libvex_ir.h $exe/
+  cp $top/include/valgrind/libvex_ir.h $exe
 fi
 if [ -f $top/include/valgrind/cputil.h ]; then
-   mv $top/include/valgrind/cputil.h $top/
+   cp $top/include/valgrind/cputil.h $inc
+   cp $top/include/valgrind/cputil.h $exe
 fi
-rm -rf $top/include
-mkdir -p $top/include
-if [ -f $top/cputil.h ]; then
-  mv $top/cputil.h $top/include/
-fi
+rm -rf $top/include/valgrind
+
 rm -rf $top/share
 rm -rf $top/lib/pkgconfig
-#
-rm -rf $exe/vgpreload_memcheck*
-rm -rf $exe/vgpreload_massif*
-rm -rf $exe/vgpreload_exp*
-rm -rf $exe/vgpreload_drd*
-rm -rf $exe/vgpreload_helgrind*
-#
-rm  -f $exe/s390*
-rm  -f $exe/power*
-rm  -f $exe/mips*
-rm  -f $exe/arm*
-#
-rm -rf $exe/none*
-rm -rf $exe/memcheck*
-rm -rf $exe/massif*
-rm -rf $exe/getoff*
-rm -rf $exe/helgrind*
-rm -rf $exe/lackey*
-rm -rf $exe/exp*
-rm -rf $exe/drd*
-rm -rf $exe/cachegrind*
-rm -rf $exe/callgrind*
-#
-rm  -f $exe/*.xml
-rm  -f $exe/*.a
-rm  -f $exe/default.supp
-#
 
-echo "#!/bin/sh" >$top/bin/cputil
-echo "VALGRIND_LIB=$pkglibdir" >>$top/bin/cputil
-echo "#export VALGRIND_LIB" >>$top/bin/cputil
-echo "\$VALGRIND_LIB/valgrind -q" '--tool=cputil "$@"' >>$top/bin/cputil
+rm -f $exe/vgpreload_dhat*
+rm -f $exe/vgpreload_drd*
+rm -f $exe/vgpreload_exp*
+rm -f $exe/vgpreload_helgrind*
+rm -f $exe/vgpreload_massif*
+rm -f $exe/vgpreload_memcheck*
+
+rm -f $exe/s390*
+rm -f $exe/power*
+rm -f $exe/mips*
+rm -f $exe/arm*
+
+rm -f $exe/none*
+rm -f $exe/memcheck*
+rm -f $exe/massif*
+rm -f $exe/getoff*
+rm -f $exe/helgrind*
+rm -f $exe/lackey*
+rm -f $exe/exp*
+rm -f $exe/drd*
+rm -f $exe/cachegrind*
+rm -f $exe/callgrind*
+
+rm -f $lib/*.a
+rm -f $lib/libmpiwrap*.so
+rm -f $exe/dh*
+rm -f $exe/*.xml
+
+if [ ! -d $cu_exe ]; then mv $exe $cu_exe; fi
+
+# cleanup
+rm -rf $exe $lib
+if [ -d $destdir$prefix/libexec ]; then rmdir $destdir$prefix/lib; fi
+
+# generate driver script
+echo "#!/bin/sh"                                       >$top/bin/cputil
+echo "VALGRIND_LIB=$cu_execdir"                        >>$top/bin/cputil
+echo "VALGRIND_LAUNCHER=$cu_execdir"                   >>$top/bin/cputil
+echo "export VALGRIND_LIB VALGRIND_LAUNCHER"           >>$top/bin/cputil
+echo '$VALGRIND_LIB/valgrind -q --tool=cputil "$@"'    >>$top/bin/cputil
 chmod +x $top/bin/cputil
 
-# --- last line of mindist ---
+# --- last line ---

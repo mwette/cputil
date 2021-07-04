@@ -1,42 +1,154 @@
-#!/bin/sh
-#
-# Copyright (C) 2016,2021 Matthew R. Wette
-# 
-# Copying and distribution of this file, with or without modification,
-# are permitted in any medium without royalty provided the copyright
-# notice and this notice are preserved.  This file is offered as-is,
-# without any warranty.
-
-touch configure.in
-
-# fix configure
-if [ ! -f ../configure-orig ]; then
-  cp ../configure ../configure-orig
-fi
-ed ../configure <<'EndOfInput'
-/^cat >confcache 
-i
-ac_config_files="$ac_config_files cputil/Makefile cputil/tests/Makefile"
-ac_config_files="$ac_config_files cputil/mindist"
-.
-w
-q
-EndOfInput
-
-touch Makefile.in
-
-# fix Makefile.in
-if [ ! -f ../Makefile.in-orig ]; then
-  cp ../Makefile.in ../Makefile.in-orig
-fi
-ed ../Makefile.in <<'EndOfInput'
-/TOOLS = 
-/		none
-i
-		cputil \
-.
-w
-q
-EndOfInput
-
-# --- last line ---
+--- configure-orig	2021-06-30 05:37:07.416727754 -0700
++++ configure	2021-06-30 05:37:46.668618082 -0700
+@@ -1059,6 +1059,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -1150,6 +1151,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1402,6 +1404,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1539,7 +1550,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1692,6 +1703,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -2959,12 +2971,7 @@
+ am_aux_dir=`cd "$ac_aux_dir" && pwd`
+ 
+ if test x"${MISSING+set}" != xset; then
+-  case $am_aux_dir in
+-  *\ * | *\	*)
+-    MISSING="\${SHELL} \"$am_aux_dir/missing\"" ;;
+-  *)
+-    MISSING="\${SHELL} $am_aux_dir/missing" ;;
+-  esac
++  MISSING="\${SHELL} '$am_aux_dir/missing'"
+ fi
+ # Use eval to expand $SHELL
+ if eval "$MISSING --is-lightweight"; then
+@@ -15215,6 +15222,8 @@
+     if (*(data + i) != *(data3 + i))
+       return 14;
+   close (fd);
++  free (data);
++  free (data3);
+   return 0;
+ }
+ _ACEOF
+@@ -16336,7 +16345,7 @@
+ #----------------------------------------------------------------------------
+ 
+ # Nb: VEX/Makefile is generated from Makefile.vex.in.
+-ac_config_files="$ac_config_files Makefile VEX/Makefile:Makefile.vex.in valgrind.spec valgrind.pc glibc-2.X.supp docs/Makefile tests/Makefile tests/vg_regtest perf/Makefile perf/vg_perf gdbserver_tests/Makefile gdbserver_tests/solaris/Makefile include/Makefile auxprogs/Makefile mpi/Makefile coregrind/Makefile memcheck/Makefile memcheck/tests/Makefile memcheck/tests/common/Makefile memcheck/tests/amd64/Makefile memcheck/tests/x86/Makefile memcheck/tests/linux/Makefile memcheck/tests/linux/debuginfod-check.vgtest memcheck/tests/darwin/Makefile memcheck/tests/solaris/Makefile memcheck/tests/amd64-linux/Makefile memcheck/tests/arm64-linux/Makefile memcheck/tests/x86-linux/Makefile memcheck/tests/amd64-solaris/Makefile memcheck/tests/x86-solaris/Makefile memcheck/tests/ppc32/Makefile memcheck/tests/ppc64/Makefile memcheck/tests/s390x/Makefile memcheck/tests/mips32/Makefile memcheck/tests/mips64/Makefile memcheck/tests/vbit-test/Makefile cachegrind/Makefile cachegrind/tests/Makefile cachegrind/tests/x86/Makefile cachegrind/cg_annotate cachegrind/cg_diff callgrind/Makefile callgrind/callgrind_annotate callgrind/callgrind_control callgrind/tests/Makefile helgrind/Makefile helgrind/tests/Makefile drd/Makefile drd/scripts/download-and-build-splash2 drd/tests/Makefile massif/Makefile massif/tests/Makefile massif/ms_print dhat/Makefile dhat/tests/Makefile lackey/Makefile lackey/tests/Makefile none/Makefile none/tests/Makefile none/tests/scripts/Makefile none/tests/amd64/Makefile none/tests/ppc32/Makefile none/tests/ppc64/Makefile none/tests/x86/Makefile none/tests/arm/Makefile none/tests/arm64/Makefile none/tests/s390x/Makefile none/tests/mips32/Makefile none/tests/mips64/Makefile none/tests/nanomips/Makefile none/tests/linux/Makefile none/tests/darwin/Makefile none/tests/solaris/Makefile none/tests/amd64-linux/Makefile none/tests/x86-linux/Makefile none/tests/amd64-darwin/Makefile none/tests/x86-darwin/Makefile none/tests/amd64-solaris/Makefile none/tests/x86-solaris/Makefile exp-bbv/Makefile exp-bbv/tests/Makefile exp-bbv/tests/x86/Makefile exp-bbv/tests/x86-linux/Makefile exp-bbv/tests/amd64-linux/Makefile exp-bbv/tests/ppc32-linux/Makefile exp-bbv/tests/arm-linux/Makefile shared/Makefile solaris/Makefile"
++ac_config_files="$ac_config_files Makefile VEX/Makefile:Makefile.vex.in valgrind.spec valgrind.pc glibc-2.X.supp docs/Makefile tests/Makefile tests/vg_regtest perf/Makefile perf/vg_perf gdbserver_tests/Makefile gdbserver_tests/solaris/Makefile include/Makefile auxprogs/Makefile mpi/Makefile coregrind/Makefile memcheck/Makefile memcheck/tests/Makefile memcheck/tests/common/Makefile memcheck/tests/amd64/Makefile memcheck/tests/x86/Makefile memcheck/tests/linux/Makefile memcheck/tests/linux/debuginfod-check.vgtest memcheck/tests/darwin/Makefile memcheck/tests/solaris/Makefile memcheck/tests/amd64-linux/Makefile memcheck/tests/arm64-linux/Makefile memcheck/tests/x86-linux/Makefile memcheck/tests/amd64-solaris/Makefile memcheck/tests/x86-solaris/Makefile memcheck/tests/ppc32/Makefile memcheck/tests/ppc64/Makefile memcheck/tests/s390x/Makefile memcheck/tests/mips32/Makefile memcheck/tests/mips64/Makefile memcheck/tests/vbit-test/Makefile cachegrind/Makefile cachegrind/tests/Makefile cachegrind/tests/x86/Makefile cachegrind/cg_annotate cachegrind/cg_diff callgrind/Makefile callgrind/callgrind_annotate callgrind/callgrind_control callgrind/tests/Makefile helgrind/Makefile helgrind/tests/Makefile drd/Makefile drd/scripts/download-and-build-splash2 drd/tests/Makefile massif/Makefile massif/tests/Makefile massif/ms_print dhat/Makefile dhat/tests/Makefile lackey/Makefile lackey/tests/Makefile cputil/Makefile cputil/tests/Makefile cputil/mindist none/Makefile none/tests/Makefile none/tests/scripts/Makefile none/tests/amd64/Makefile none/tests/ppc32/Makefile none/tests/ppc64/Makefile none/tests/x86/Makefile none/tests/arm/Makefile none/tests/arm64/Makefile none/tests/s390x/Makefile none/tests/mips32/Makefile none/tests/mips64/Makefile none/tests/nanomips/Makefile none/tests/linux/Makefile none/tests/darwin/Makefile none/tests/solaris/Makefile none/tests/amd64-linux/Makefile none/tests/x86-linux/Makefile none/tests/amd64-darwin/Makefile none/tests/x86-darwin/Makefile none/tests/amd64-solaris/Makefile none/tests/x86-solaris/Makefile exp-bbv/Makefile exp-bbv/tests/Makefile exp-bbv/tests/x86/Makefile exp-bbv/tests/x86-linux/Makefile exp-bbv/tests/amd64-linux/Makefile exp-bbv/tests/ppc32-linux/Makefile exp-bbv/tests/arm-linux/Makefile shared/Makefile solaris/Makefile"
+ 
+ ac_config_files="$ac_config_files coregrind/link_tool_exe_linux"
+ 
+@@ -17776,6 +17785,9 @@
+     "dhat/tests/Makefile") CONFIG_FILES="$CONFIG_FILES dhat/tests/Makefile" ;;
+     "lackey/Makefile") CONFIG_FILES="$CONFIG_FILES lackey/Makefile" ;;
+     "lackey/tests/Makefile") CONFIG_FILES="$CONFIG_FILES lackey/tests/Makefile" ;;
++    "cputil/Makefile") CONFIG_FILES="$CONFIG_FILES cputil/Makefile" ;;
++    "cputil/tests/Makefile") CONFIG_FILES="$CONFIG_FILES cputil/tests/Makefile" ;;
++    "cputil/mindist") CONFIG_FILES="$CONFIG_FILES cputil/mindist" ;;
+     "none/Makefile") CONFIG_FILES="$CONFIG_FILES none/Makefile" ;;
+     "none/tests/Makefile") CONFIG_FILES="$CONFIG_FILES none/tests/Makefile" ;;
+     "none/tests/scripts/Makefile") CONFIG_FILES="$CONFIG_FILES none/tests/scripts/Makefile" ;;
+--- Makefile.in-orig	2021-06-30 05:36:56.784400931 -0700
++++ Makefile.in	2021-06-30 05:37:40.648729853 -0700
+@@ -1,4 +1,4 @@
+-# Makefile.in generated by automake 1.16.2 from Makefile.am.
++# Makefile.in generated by automake 1.16.3 from Makefile.am.
+ # @configure_input@
+ 
+ # Copyright (C) 1994-2020 Free Software Foundation, Inc.
+@@ -255,6 +255,8 @@
+ DIST_ARCHIVES = $(distdir).tar.gz $(distdir).tar.bz2
+ GZIP_ENV = --best
+ DIST_TARGETS = dist-bzip2 dist-gzip
++# Exists only to be overridden by the user if desired.
++AM_DISTCHECK_DVI_TARGET = dvi
+ distuninstallcheck_listfiles = find . -type f -print
+ am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
+   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
+@@ -439,6 +441,7 @@
+ prefix = @prefix@
+ program_transform_name = @program_transform_name@
+ psdir = @psdir@
++runstatedir = @runstatedir@
+ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ srcdir = @srcdir@
+@@ -638,6 +641,7 @@
+ 		massif \
+ 		dhat \
+ 		lackey \
++		cputil \
+ 		none
+ 
+ EXP_TOOLS = \
+@@ -1098,7 +1102,7 @@
+ 	    $(DISTCHECK_CONFIGURE_FLAGS) \
+ 	    --srcdir=../.. --prefix="$$dc_install_base" \
+ 	  && $(MAKE) $(AM_MAKEFLAGS) \
+-	  && $(MAKE) $(AM_MAKEFLAGS) dvi \
++	  && $(MAKE) $(AM_MAKEFLAGS) $(AM_DISTCHECK_DVI_TARGET) \
+ 	  && $(MAKE) $(AM_MAKEFLAGS) check \
+ 	  && $(MAKE) $(AM_MAKEFLAGS) install \
+ 	  && $(MAKE) $(AM_MAKEFLAGS) installcheck \
+@@ -1160,7 +1164,8 @@
+ 	done
+ install: $(BUILT_SOURCES)
+ 	$(MAKE) $(AM_MAKEFLAGS) install-recursive
+-install-exec: install-exec-recursive
++install-exec: $(BUILT_SOURCES)
++	$(MAKE) $(AM_MAKEFLAGS) install-exec-recursive
+ install-data: install-data-recursive
+ uninstall: uninstall-recursive
+ 
+@@ -1263,7 +1268,7 @@
+ 	uninstall-vglibDATA
+ 
+ .MAKE: $(am__recursive_targets) all check install install-am \
+-	install-strip
++	install-exec install-strip
+ 
+ .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
+ 	am--refresh check check-am clean clean-cscope clean-generic \
