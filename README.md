@@ -49,18 +49,9 @@ To install:
 2. Clone or otherwise install this cputil distribution in a directory
    called *cputil* under valgrind-3.17.X
 
-3. In the subdirectory cputil, execute *patch1*:
+3. In the valgrind top-level directory execute:
    ```
-   $ pwd
-   .../valgring-3.17.X/cputil
-   $ ./patch1
-   ```
-
-   Note that the above tries to edit the autogenerted configure and
-   Makefile.in files.  If that does not work then you can try
-   ```
-   $ cd ..
-   $ cputil/patch/upd-vg-files
+   $ cputil/upd-vg-files
    $ ./autogen.sh
    ```
 
@@ -71,32 +62,36 @@ To install:
    $ sudo make install
    ```
 
-On macOS, you may need to perform the following steps:
+   On macOS, you may need to perform the following steps:
    ```
    $ CFLAGS="" ./configure --prefix=/usr/local \
      ./configure --enable-only64bit --prefix=/usr/local
    ```
 
-4b. Optionally, if you want a minimal distribution, do use this sequence:
+4b. Optionally, if you want a minimal distribution, use this sequence,
+    using /var/tmp/bindist as a place to install the distribution:
    ```
    $ ./configure --prefix=/usr/local
+   $ make 
    $ mkdir -p /var/tmp/bindist
-   $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil
-   $ make DESTDIR=/var/tmp/bindist pkglibdir=/usr/local/lib/cputil install
-   $ sh cputil/mindist /var/tmp/bindist /usr/local/lib/cputil
+   $ make DESTDIR=/var/tmp/bindist/ install
+   $ sh cputil/mindist /var/tmp/bindist
    ```
-The above will generate a distribution.  To install, become root if necessary,
-then execute the following:
+   The above will generate a distribution.  To install, become root if 
+   necessary, then execute the following:
    ```
    # cd /var/tmp/bindist
    # cd usr/local
    # tar cf - . | (cd /usr/local; tar xvf -)
    ```
+   In this case, the command to execute is `cputil'
+   instead of `valgrind --tool=cputil`.
 
 ### dumping the op-count table
 To dump the internal table execute
    ```
    $ valgrind --tool=cputil --dump-op-table=dump.cut true
+     [OR, for min dist, cputil --dump-op-table=dump.cut true]
    ```
 There is no way to dump the op-table w/o specifing a program to so
 we use use /bin/true.
