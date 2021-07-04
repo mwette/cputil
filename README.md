@@ -56,7 +56,7 @@ To install:
    ```
 
 4a. In the valgrind top directory run configure, make and install:
-   ``
+   ```
    $ ./configure --prefix=/usr/local
    $ make 
    $ sudo make install
